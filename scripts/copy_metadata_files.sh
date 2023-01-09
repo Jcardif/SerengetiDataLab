@@ -6,6 +6,9 @@ resource_group_name="SerengetiDataLab"
 container_name="metadata"
 blobs_to_copy=("SnapshotSerengetiS01.json.zip" "SnapshotSerengetiS02.json.zip" "SnapshotSerengetiS03.json.zip")
 
+# Set the subscription
+az account set --subscription "a1a27566-3e3c-42d7-a372-692095cd8521"
+
 # Create a storage account
 az storage account create --name $storage_account_name --resource-group $resource_group_name --sku Standard_LRS
 
