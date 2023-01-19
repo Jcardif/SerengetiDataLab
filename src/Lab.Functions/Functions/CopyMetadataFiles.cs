@@ -1,6 +1,11 @@
 using System.Net;
+using Azure.Storage.Blobs;
+using Azure.Storage.Files.DataLake;
+using Azure.Storage.Sas;
+using Lab.Functions.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Lab.Functions
@@ -15,11 +20,12 @@ namespace Lab.Functions
         }
 
         [Function("CopyMetadataFiles")]
-        public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-            var sourceContainer  = "https://lilablobssc.blob.core.windows.net/snapshotserengeti-v-2-0";
+            var sourceConnectionString="BlobEndpoint=https://lilablobssc.blob.core.windows.net;";
+            var sourceContainerName="snapshotserengeti-v-2-0";
 
             // s01 to s011
             var metadataFiles=new string[]
@@ -40,10 +46,62 @@ namespace Lab.Functions
                 "SnapshotSerengetiSplits_v0.json"
             };
 
-            var destinationContainerName="zippedmetadatafiles";
-            
 
+            var storageService=new AzureStorageService();
+            var config = GetAppSettings();
+
+            var accountName= config["AzureStorage:DataLakeStorageAccountName"];
+            var accountKey=config["AzureStorage:DataLakeStorageAccountKey"];
+
+            var adlsClient = storageService.GetDataLakeServiceClient(accountName, accountKey);
+
+            var fileSystemName="default";
+            var directoryName="metadata";
+
+            var fileSystemClient = await storageService.CreateFileSystem(adlsClient, fileSystemName);
+            var directoryClient = await storageService.CreateDirectory(adlsClient, fileSystemName, directoryName);
+
+            var sourceContainerClient=new BlobContainerClient(sourceConnectionString, sourceContainerName);
+
+            foreach (var metadataFile in metadataFiles)
+            {
+                var sourceBlobClient = sourceContainerClient.GetBlobClient(metadataFile);
+                // if file exists continue
+                if (directoryClient.GetFileClient(metadataFile).Exists())
+                {
+                    _logger.LogInformation("file exists");
+                    continue;
+                }
+
+                var fileClient = directoryClient.GetFileClient(metadataFile);
+
+                var url=fileClient.GenerateSasUri(DataLakeSasPermissions.All, DateTimeOffset.UtcNow.AddMinutes(5)).ToString();
+
+
+                var blobUrl=url.Replace("dfs.core.windows.net", "blob.core.windows.net");
+
+                var destBlobClient = new BlobClient(new Uri(blobUrl));
+
+                var ops= await destBlobClient.StartCopyFromUriAsync(sourceBlobClient.Uri);
+                // wait for the copy to complete
+                await ops.WaitForCompletionAsync();
+
+                _logger.LogInformation($"Copied {metadataFile} to {destBlobClient.Uri}");
+            }
+
+            var response = req.CreateResponse(HttpStatusCode.OK);
             return response;
+        }
+
+        private static dynamic GetAppSettings()
+        {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            return config;
         }
     }
 }
