@@ -2,10 +2,11 @@
 
 An E2E solution of the Data Resources on Azure using the Snapshot Serengeti dataset. This E2E solution focuses Azure Synapse Analytics, Microsoft Purview, Power Bi & the Azure Data Factory. 
 
+
 # Azure Resources
 This lab leverages the following Azure resources:
 
-### Microsoft Purvew
+### Microsoft Purview
 Purview is a data governance and catalog service that allows discorvering, classifyong and understanding data. We'll use the snapshot serengeti dayaset to sow how Purview can be used to discover and classify data--
 
 ### Azure Synapse Analytics

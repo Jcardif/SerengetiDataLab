@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Lab.Functions": {
-      "commandName": "Project",
-      "commandLineArgs": "--port 7187",
-      "launchBrowser": false
-    }
-  }
-}
