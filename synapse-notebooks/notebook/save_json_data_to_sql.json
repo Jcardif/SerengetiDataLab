@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "85315f7a-8cde-4f76-b86b-1d808d1f5f8c"
+				"spark.autotune.trackingId": "ba3e6f5e-6087-48b5-9749-2adadfe15e1f"
 			}
 		},
 		"metadata": {
@@ -53,13 +53,18 @@
 				"source": [
 					"#r \"nuget: Microsoft.Azure.Storage.Common\"\n",
 					"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
-					"#r \"nuget: Microsoft.Azure.Storage.File\""
+					"#r \"nuget: Microsoft.Azure.Storage.File\"\n",
+					"#r \"nuget: Newtonsoft.Json\""
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
-				"cell_type": "markdown",
+				"cell_type": "code",
 				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
 					"nteract": {
 						"transient": {
 							"deleting": false
@@ -67,8 +72,12 @@
 					}
 				},
 				"source": [
-					"usi"
-				]
+					"using Microsoft.Azure.Storage;\n",
+					"using Microsoft.Azure.Storage.Blob;\n",
+					"using System.IO;\n",
+					"using Newtonsoft.Json;"
+				],
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -87,9 +96,8 @@
 					"CloudBlobContainer blobContainer;\n",
 					"CloudBlobDirectory blobDirectory;\n",
 					"\n",
-					"string connectionString = \"\";\n",
 					"\n",
-					"private void GetStorage()\n",
+					"private void InitStorage()\n",
 					"{\n",
 					"    // Create a FileEndpoint for the destination ADLS\n",
 					"    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);\n",
@@ -100,6 +108,103 @@
 					"}"
 				],
 				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"private async Task<dynamic> ReadJsonFile (CloudBlockBlob jsonBlob)\n",
+					"{\n",
+					"    using (var memoryStream = new MemoryStream())\n",
+					"    {\n",
+					"        // Download the JSON file to a memory stream\n",
+					"        await jsonBlob.DownloadToStreamAsync(memoryStream);\n",
+					"\n",
+					"        // Reset the memory stream position\n",
+					"        memoryStream.Position = 0;\n",
+					"\n",
+					"        // Use a JsonTextReader to read the JSON file in chunks\n",
+					"        using (var jsonTextReader = new JsonTextReader(new StreamReader(memoryStream)) { CloseInput = false })\n",
+					"        {\n",
+					"            // Use a JsonSerializer to deserialize the JSON file\n",
+					"            var jsonSerializer = new JsonSerializer();\n",
+					"\n",
+					"            // Read the JSON file in chunks and deserialize it\n",
+					"            dynamic jsonObject = jsonSerializer.Deserialize<dynamic>(jsonTextReader);\n",
+					"\n",
+					"            return jsonObject;\n",
+					"        }\n",
+					"    }\n",
+					"}\n",
+					""
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"InitStorage();\n",
+					"\n",
+					"//season files\n",
+					"var seasonFiles = new string[]\n",
+					"{\n",
+					"    \"SnapshotSerengetiS01.json\",\n",
+					"    \"SnapshotSerengetiS02.json\",\n",
+					"    \"SnapshotSerengetiS03.json\",\n",
+					"    \"SnapshotSerengetiS04.json\",\n",
+					"    \"SnapshotSerengetiS05.json\",\n",
+					"    \"SnapshotSerengetiS06.json\",\n",
+					"    \"SnapshotSerengetiS07.json\",\n",
+					"    \"SnapshotSerengetiS08.json\",\n",
+					"    \"SnapshotSerengetiS09.json\",\n",
+					"    \"SnapshotSerengetiS10.json\",\n",
+					"    \"SnapshotSerengetiS11.json\",\n",
+					"};\n",
+					"\n",
+					"var blob=blobDirectory.GetBlockBlobReference(seasonFiles[0]);\n",
+					"\n",
+					"var jsnObj=await ReadJsonFile(blob);"
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Console.WriteLine(JsonConvert.SerializeObject(jsnObj[\"categories\"], Formatting.Indented));"
+				],
+				"execution_count": 10
 			}
 		]
 	}
