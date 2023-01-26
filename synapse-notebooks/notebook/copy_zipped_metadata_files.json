@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c54a4834-9c54-413f-8a55-aaba33f4c584"
+				"spark.autotune.trackingId": "c3a50015-ee86-4edc-9b09-39348715d21e"
 			}
 		},
 		"metadata": {
@@ -65,9 +65,7 @@
 				"source": [
 					"#r \"nuget: Microsoft.Azure.Storage.Common\"\n",
 					"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
-					"#r \"nuget: Microsoft.Azure.Storage.File\"\n",
-					"#r \"nuget: Microsoft.Azure.Storage.DataMovement\"\n",
-					"#r \"nuget: Azure.Identity\""
+					"#r \"nuget: Microsoft.Azure.Storage.File\""
 				],
 				"execution_count": 115
 			},
