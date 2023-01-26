@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "dbf3f7a3-7056-43d5-8fd5-9fdf7a1f2f73"
+				"spark.autotune.trackingId": "c54a4834-9c54-413f-8a55-aaba33f4c584"
 			}
 		},
 		"metadata": {
@@ -38,14 +38,13 @@
 				"endpoint": "https://serengetidatalab.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/DefaultPool",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.3",
 				"nodeCount": 10,
 				"cores": 8,
 				"memory": 56,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -70,7 +69,7 @@
 					"#r \"nuget: Microsoft.Azure.Storage.DataMovement\"\n",
 					"#r \"nuget: Azure.Identity\""
 				],
-				"execution_count": 108
+				"execution_count": 115
 			},
 			{
 				"cell_type": "code",
@@ -99,7 +98,7 @@
 					"using Microsoft.Azure.Storage.Auth;\n",
 					""
 				],
-				"execution_count": 109
+				"execution_count": 116
 			},
 			{
 				"cell_type": "code",
@@ -120,7 +119,7 @@
 					"\n",
 					"string destConnectionString = \"\";"
 				],
-				"execution_count": 110
+				"execution_count": 117
 			},
 			{
 				"cell_type": "code",
@@ -158,7 +157,7 @@
 					"    destDirectory = destContainer.GetDirectoryReference(\"metadata\");\n",
 					"}"
 				],
-				"execution_count": 111
+				"execution_count": 118
 			},
 			{
 				"cell_type": "code",
@@ -199,7 +198,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 112
+				"execution_count": 119
 			},
 			{
 				"cell_type": "code",
@@ -242,7 +241,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 113
+				"execution_count": 120
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +296,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 114
+				"execution_count": 121
 			},
 			{
 				"cell_type": "code",
@@ -314,7 +313,8 @@
 				},
 				"source": [
 					""
-				]
+				],
+				"execution_count": null
 			}
 		]
 	}
