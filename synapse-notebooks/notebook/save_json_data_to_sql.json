@@ -17,15 +17,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ba3e6f5e-6087-48b5-9749-2adadfe15e1f"
+				"spark.autotune.trackingId": "2da09554-6c53-407c-a6fc-610839cfe13c"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_pyspark",
-				"display_name": "Synapse PySpark"
+				"name": "synapse_sparkdotnet",
+				"display_name": "csharp"
 			},
 			"language_info": {
 				"name": "csharp"
@@ -54,7 +54,8 @@
 					"#r \"nuget: Microsoft.Azure.Storage.Common\"\n",
 					"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
 					"#r \"nuget: Microsoft.Azure.Storage.File\"\n",
-					"#r \"nuget: Newtonsoft.Json\""
+					"#r \"nuget: Newtonsoft.Json\"\n",
+					"#r \"nuget: \""
 				],
 				"execution_count": 1
 			},
@@ -96,11 +97,13 @@
 					"CloudBlobContainer blobContainer;\n",
 					"CloudBlobDirectory blobDirectory;\n",
 					"\n",
+					"var storageConnectionString = \"\";\n",
+					"var dbConnectionString = \"\";\n",
 					"\n",
 					"private void InitStorage()\n",
 					"{\n",
 					"    // Create a FileEndpoint for the destination ADLS\n",
-					"    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);\n",
+					"    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);\n",
 					"\n",
 					"    var blobClient= storageAccount.CreateCloudBlobClient();\n",
 					"    blobContainer =  blobClient.GetContainerReference(\"snapshot-serengeti\");\n",
