@@ -17,15 +17,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2da09554-6c53-407c-a6fc-610839cfe13c"
+				"spark.autotune.trackingId": "e87f370f-0f33-4ede-a56c-524e5f7895ef"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_sparkdotnet",
-				"display_name": "csharp"
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "csharp"
@@ -55,7 +55,7 @@
 					"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
 					"#r \"nuget: Microsoft.Azure.Storage.File\"\n",
 					"#r \"nuget: Newtonsoft.Json\"\n",
-					"#r \"nuget: \""
+					"#r \"nuget: Microsoft.Data.SqlClient\""
 				],
 				"execution_count": 1
 			},
@@ -76,7 +76,9 @@
 					"using Microsoft.Azure.Storage;\n",
 					"using Microsoft.Azure.Storage.Blob;\n",
 					"using System.IO;\n",
-					"using Newtonsoft.Json;"
+					"using Newtonsoft.Json;\n",
+					"using Microsoft.Data.SqlClient;\n",
+					""
 				],
 				"execution_count": 2
 			},
