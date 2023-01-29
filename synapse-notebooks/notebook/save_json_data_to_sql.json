@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "10070a01-5bbb-4100-a7fb-28d85d269033"
+				"spark.autotune.trackingId": "7992e0f4-5591-4b7d-9aac-88c30e666253"
 			}
 		},
 		"metadata": {
@@ -103,7 +103,7 @@
 					"var storageConnectionString = \"\";\n",
 					"var dbConnectionString = \"\";\n",
 					"\n",
-					"private void InitStorage()\n",
+					"private void InitStorageAndDb()\n",
 					"{\n",
 					"    // Create a FileEndpoint for the destination ADLS\n",
 					"    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);\n",
@@ -171,7 +171,7 @@
 					}
 				},
 				"source": [
-					"InitStorage();\n",
+					"InitStorageAndDb();\n",
 					"\n",
 					"//season files\n",
 					"var seasonFiles = new string[]\n",
@@ -212,6 +212,25 @@
 					"Console.WriteLine(JsonConvert.SerializeObject(jsnObj[\"categories\"], Formatting.Indented));"
 				],
 				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"InitStorageAndDb();\n",
+					"sqlConn.Open();"
+				],
+				"execution_count": null
 			}
 		]
 	}
