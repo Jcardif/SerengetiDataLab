@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e87f370f-0f33-4ede-a56c-524e5f7895ef"
+				"spark.autotune.trackingId": "10070a01-5bbb-4100-a7fb-28d85d269033"
 			}
 		},
 		"metadata": {
@@ -98,6 +98,7 @@
 				"source": [
 					"CloudBlobContainer blobContainer;\n",
 					"CloudBlobDirectory blobDirectory;\n",
+					"SqlConnection sqlConn;\n",
 					"\n",
 					"var storageConnectionString = \"\";\n",
 					"var dbConnectionString = \"\";\n",
@@ -110,6 +111,7 @@
 					"    var blobClient= storageAccount.CreateCloudBlobClient();\n",
 					"    blobContainer =  blobClient.GetContainerReference(\"snapshot-serengeti\");\n",
 					"    blobDirectory = blobContainer.GetDirectoryReference(\"metadata\");\n",
+					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
 				"execution_count": 11
