@@ -17,15 +17,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2da09554-6c53-407c-a6fc-610839cfe13c"
+				"spark.autotune.trackingId": "7992e0f4-5591-4b7d-9aac-88c30e666253"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_sparkdotnet",
-				"display_name": "csharp"
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "csharp"
@@ -55,7 +55,7 @@
 					"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
 					"#r \"nuget: Microsoft.Azure.Storage.File\"\n",
 					"#r \"nuget: Newtonsoft.Json\"\n",
-					"#r \"nuget: \""
+					"#r \"nuget: Microsoft.Data.SqlClient\""
 				],
 				"execution_count": 1
 			},
@@ -76,7 +76,9 @@
 					"using Microsoft.Azure.Storage;\n",
 					"using Microsoft.Azure.Storage.Blob;\n",
 					"using System.IO;\n",
-					"using Newtonsoft.Json;"
+					"using Newtonsoft.Json;\n",
+					"using Microsoft.Data.SqlClient;\n",
+					""
 				],
 				"execution_count": 2
 			},
@@ -96,11 +98,12 @@
 				"source": [
 					"CloudBlobContainer blobContainer;\n",
 					"CloudBlobDirectory blobDirectory;\n",
+					"SqlConnection sqlConn;\n",
 					"\n",
 					"var storageConnectionString = \"\";\n",
 					"var dbConnectionString = \"\";\n",
 					"\n",
-					"private void InitStorage()\n",
+					"private void InitStorageAndDb()\n",
 					"{\n",
 					"    // Create a FileEndpoint for the destination ADLS\n",
 					"    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);\n",
@@ -108,6 +111,7 @@
 					"    var blobClient= storageAccount.CreateCloudBlobClient();\n",
 					"    blobContainer =  blobClient.GetContainerReference(\"snapshot-serengeti\");\n",
 					"    blobDirectory = blobContainer.GetDirectoryReference(\"metadata\");\n",
+					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
 				"execution_count": 11
@@ -167,7 +171,7 @@
 					}
 				},
 				"source": [
-					"InitStorage();\n",
+					"InitStorageAndDb();\n",
 					"\n",
 					"//season files\n",
 					"var seasonFiles = new string[]\n",
@@ -208,6 +212,25 @@
 					"Console.WriteLine(JsonConvert.SerializeObject(jsnObj[\"categories\"], Formatting.Indented));"
 				],
 				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"InitStorageAndDb();\n",
+					"sqlConn.Open();"
+				],
+				"execution_count": null
 			}
 		]
 	}
