@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "afeaa660-e144-44fb-9caa-248ecd0aaa21"
+				"spark.autotune.trackingId": "2107d819-844b-4749-b069-52d9a8e89089"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 164
+				"execution_count": 189
 			},
 			{
 				"cell_type": "code",
@@ -81,7 +81,7 @@
 					"using System.Data;\n",
 					""
 				],
-				"execution_count": 165
+				"execution_count": 190
 			},
 			{
 				"cell_type": "code",
@@ -217,7 +217,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 166
+				"execution_count": 191
 			},
 			{
 				"cell_type": "code",
@@ -238,7 +238,6 @@
 					"SqlConnection sqlConn;\n",
 					"\n",
 					"\n",
-					"\n",
 					"var sqlCon = new SqlConnection(dbConnectionString);\n",
 					"\n",
 					"sqlCon.OpenAsync();\n",
@@ -254,7 +253,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 167
+				"execution_count": 192
 			},
 			{
 				"cell_type": "code",
@@ -293,7 +292,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 168
+				"execution_count": 193
 			},
 			{
 				"cell_type": "code",
@@ -339,7 +338,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 169
+				"execution_count": 194
 			},
 			{
 				"cell_type": "code",
@@ -399,7 +398,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 170
+				"execution_count": 195
 			},
 			{
 				"cell_type": "code",
@@ -442,7 +441,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 177
+				"execution_count": 196
 			},
 			{
 				"cell_type": "code",
@@ -494,7 +493,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 172
+				"execution_count": 197
 			},
 			{
 				"cell_type": "code",
@@ -538,11 +537,11 @@
 					"    await BulkInsertImages(serengetiData.Images);\n",
 					"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
 					"\n",
-					"    Console.WriteLine($\"Completed processing {file}\")\n",
+					"    Console.WriteLine($\"Completed processing {file}\");\n",
 					"\n",
 					"}"
 				],
-				"execution_count": 173
+				"execution_count": 198
 			}
 		]
 	}
