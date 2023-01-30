@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7992e0f4-5591-4b7d-9aac-88c30e666253"
+				"spark.autotune.trackingId": "c8478a28-9949-46f6-b3d7-689117e50e8f"
 			}
 		},
 		"metadata": {
@@ -55,9 +55,9 @@
 					"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
 					"#r \"nuget: Microsoft.Azure.Storage.File\"\n",
 					"#r \"nuget: Newtonsoft.Json\"\n",
-					"#r \"nuget: Microsoft.Data.SqlClient\""
+					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 1
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -77,10 +77,10 @@
 					"using Microsoft.Azure.Storage.Blob;\n",
 					"using System.IO;\n",
 					"using Newtonsoft.Json;\n",
-					"using Microsoft.Data.SqlClient;\n",
+					"using System.Data.SqlClient;\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -227,10 +227,9 @@
 					}
 				},
 				"source": [
-					"InitStorageAndDb();\n",
-					"sqlConn.Open();"
+					""
 				],
-				"execution_count": null
+				"execution_count": 19
 			}
 		]
 	}
