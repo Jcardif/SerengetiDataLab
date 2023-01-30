@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4e4a791a-d3d7-4ada-9862-a0ff8404119c"
+				"spark.autotune.trackingId": "68c66f31-88ac-491b-ae83-2180ea0101fa"
 			}
 		},
 		"metadata": {
@@ -306,6 +306,134 @@
 					"}"
 				],
 				"execution_count": 78
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"private async Task InsertImagesAsync(dynamic images)\n",
+					"{\n",
+					"    await sqlConn.OpenAsync();\n",
+					"\n",
+					"    // Create a temporary table to store the data you want to insert\n",
+					"    using (SqlCommand createTempTableCmd = new SqlCommand(\"CREATE TABLE #temp_images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\", sqlConn))\n",
+					"    {\n",
+					"        createTempTableCmd.ExecuteNonQuery();\n",
+					"    }\n",
+					"\n",
+					"    // Insert data into the temporary table\n",
+					"    string insertIntoTempTableCommand = \"INSERT INTO #temp_images (id, file_name, frame_num, seq_id, width, height, corrupt, location, seq_num_frames, datetime) VALUES (@id, @file_name, @frame_num, @seq_id, @width, @height, @corrupt, @location, @seq_num_frames, @datetime)\";\n",
+					"    foreach (var image in images)\n",
+					"    {\n",
+					"        using (SqlCommand insertIntoTempTableCmd = new SqlCommand(insertIntoTempTableCommand, sqlConn))\n",
+					"        {\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@id\", (string)image[\"id\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@file_name\", (string)image[\"file_name\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@frame_num\", (int)image[\"frame_num\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@seq_id\", (string)image[\"seq_id\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@width\", (int)image[\"width\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@height\", (int)image[\"height\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@corrupt\", (bool)image[\"corrupt\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@location\", (string)image[\"location\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@seq_num_frames\", (int)image[\"seq_num_frames\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@datetime\", (DateTime)image[\"datetime\"]);\n",
+					"\n",
+					"            insertIntoTempTableCmd.ExecuteNonQuery();\n",
+					"        }\n",
+					"    }\n",
+					"\n",
+					"    // Insert only unique records into the target table\n",
+					"    string insertIntoImagesCommand = \"INSERT INTO images (id, file_name, frame_num, seq_id, width, height, corrupt, location, seq_num_frames, datetime) SELECT id, file_name, frame_num, seq_id, width, height, corrupt, location, seq_num_frames, datetime FROM #temp_images WHERE NOT EXISTS (SELECT 1 FROM images WHERE images.id = #temp_images.id)\";\n",
+					"    using (SqlCommand insertIntoImagesCmd = new SqlCommand(insertIntoImagesCommand, sqlConn))\n",
+					"    {\n",
+					"        insertIntoImagesCmd.Parameters.AddWithValue(\"@id\", (string)image[\"id\"]);\n",
+					"        insertIntoImagesCmd.Parameters.AddWithValue(\"@file_name\", (string)image[\"file_name\"]);\n",
+					"        insertIntoImagesCmd.Parameters.AddWithValue(\"@frame_num\", (int)image[\"frame_num\"]);\n",
+					"        insertIntoImagesCmd.Parameters.AddWithValue(\"@seq_id\", (string)image[\"seq_id\"]);\n",
+					"        insertIntoImagesCmd.Parameters.AddWithValue(\"@width\", (int)image[\"width\"]);\n",
+					"        insertIntoImagesCmd.Parameters.AddWithValue(\"@height\", (int)image[\"height\"]);\n",
+					"        insertIntoImagesCmd.Parameters.AddWithValue(\"@corrupt\", (bool)image[\"corrupt\"]);\n",
+					"        insertIntoImagesCmd.Parameters.AddWithValue(\"@location\", (string)image[\"location\"]);\n",
+					"        insertIntoImagesCmd.Parameters.AddWithValue(\"@seq_num_frames\", (int)image[\"seq_num_frames\"]);\n",
+					"        insertIntoImagesCmd.Parameters.AddWithValue(\"@datetime\", (DateTime)image[\"datetime\"]);\n",
+					"        await insertIntoImagesCmd.ExecuteNonQueryAsync();\n",
+					"    }\n",
+					"\n",
+					"    await sqlConn.CloseAsync();\n",
+					"\n",
+					"}"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"private async Task InsertAnnotationsAsync(dynamic annotations)\n",
+					"{\n",
+					"    await sqlConn.OpenAsync();\n",
+					"\n",
+					"    // Create a temporary table to store the data you want to insert\n",
+					"    using (SqlCommand createTempTableCmd = new SqlCommand(\"CREATE TABLE #temp_annotations (id VARCHAR(255), category_id INT, seq_id VARCHAR(255), season VARCHAR(255), datetime DATETIME, subject_id VARCHAR(255), count VARCHAR(255), standing FLOAT, resting FLOAT, moving FLOAT, interacting FLOAT, young_present FLOAT, image_id VARCHAR(255), location VARCHAR(255));\", sqlConn))\n",
+					"    {\n",
+					"        createTempTableCmd.ExecuteNonQuery();\n",
+					"    }\n",
+					"\n",
+					"    // Insert data into the temporary table\n",
+					"    string insertIntoTempTableCommand = \"INSERT INTO #temp_annotations (id, category_id, seq_id, season, datetime, subject_id, count, standing, resting, moving, interacting, young_present, image_id, location) VALUES (@id, @category_id, @seq_id, @season, @datetime, @subject_id, @count, @standing, @resting, @moving, @interacting, @young_present, @image_id, @location)\";\n",
+					"    foreach (var annotation in annotations)\n",
+					"    {\n",
+					"        using (SqlCommand insertIntoTempTableCmd = new SqlCommand(insertIntoTempTableCommand, sqlConn))\n",
+					"        {\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@id\", (string)annotation[\"id\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@category_id\", (int)annotation[\"category_id\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@seq_id\", (string)annotation[\"seq_id\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@season\", (string)annotation[\"season\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@datetime\", (DateTime)annotation[\"datetime\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@subject_id\", (string)annotation[\"subject_id\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@count\", (string)annotation[\"count\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@standing\", (float)annotation[\"standing\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@resting\", (float)annotation[\"resting\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@moving\", (float)annotation[\"moving\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@interacting\", (float)annotation[\"interacting\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@young_present\", (float)annotation[\"young_present\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@image_id\", (string)annotation[\"image_id\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@location\", (string)annotation[\"location\"]);\n",
+					"\n",
+					"            insertIntoTempTableCmd.ExecuteNonQuery();\n",
+					"        }\n",
+					"\n",
+					"         // Insert only unique records into the target table\n",
+					"        using (SqlCommand insertIntoTargetTableCmd = new SqlCommand(\"INSERT INTO annotations (id, category_id, seq_id, season, datetime, subject_id, count, standing, resting, moving, interacting, young_present, image_id, location) SELECT id, category_id, seq_id, season, datetime, subject_id, count, standing, resting, moving, interacting, young_present, image_id, location FROM #temp_annotations WHERE NOT EXISTS (SELECT * FROM annotations WHERE id = #temp_annotations.id);\", sqlConn))\n",
+					"        {\n",
+					"            insertIntoTargetTableCmd.ExecuteNonQuery();\n",
+					"        }\n",
+					"    }\n",
+					"\n",
+					"    await sqlConn.CloseAsync();\n",
+					"}"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
