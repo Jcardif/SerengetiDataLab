@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f54ed546-b39e-4892-a087-1e9c8f69dec9"
+				"spark.autotune.trackingId": "4e4a791a-d3d7-4ada-9862-a0ff8404119c"
 			}
 		},
 		"metadata": {
@@ -100,6 +100,8 @@
 					"CloudBlobDirectory blobDirectory;\n",
 					"SqlConnection sqlConn;\n",
 					"\n",
+					"var storageConnectionString = \"\";\n",
+					"var dbConnectionString = \"\";\n",
 					"\n",
 					"private void InitStorageAndDb()\n",
 					"{\n",
@@ -248,7 +250,7 @@
 					"await sqlConn.CloseAsync();\n",
 					""
 				],
-				"execution_count": 53
+				"execution_count": 81
 			},
 			{
 				"cell_type": "code",
@@ -264,9 +266,66 @@
 					}
 				},
 				"source": [
-					""
+					"private async Task InsertCategoriesAsync(dynamic categories)\n",
+					"{\n",
+					"    await sqlConn.OpenAsync();\n",
+					"\n",
+					"    // Create a temporary table to store the data you want to insert\n",
+					"    using (SqlCommand createTempTableCmd = new SqlCommand(\"CREATE TABLE #temp_categories (id INT, name VARCHAR(255));\", sqlConn))\n",
+					"    {\n",
+					"        createTempTableCmd.ExecuteNonQuery();\n",
+					"    }\n",
+					"\n",
+					"    // Insert data into the temporary table\n",
+					"    string insertIntoTempTableCommand = \"INSERT INTO #temp_categories (id, name) VALUES (@id, @name)\";\n",
+					"    foreach (var category in categories)\n",
+					"    {\n",
+					"        using (SqlCommand insertIntoTempTableCmd = new SqlCommand(insertIntoTempTableCommand, sqlConn))\n",
+					"        {\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@id\", (string)category[\"id\"]);\n",
+					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@name\", (string)category[\"name\"]);\n",
+					"\n",
+					"            insertIntoTempTableCmd.ExecuteNonQuery();\n",
+					"        }\n",
+					"    }\n",
+					"\n",
+					"    // Insert only unique records into the target table\n",
+					"    string insertIntoCategoriesCommand = \"INSERT INTO categories (id, name) SELECT id, name FROM #temp_categories WHERE NOT EXISTS (SELECT 1 FROM categories WHERE categories.id = #temp_categories.id)\";\n",
+					"    using (SqlCommand insertIntoCategoriesCmd = new SqlCommand(insertIntoCategoriesCommand, sqlConn))\n",
+					"    {\n",
+					"        insertIntoCategoriesCmd.ExecuteNonQuery();\n",
+					"    }\n",
+					"\n",
+					"    // Drop the temporary table\n",
+					"    using (SqlCommand dropTempTableCmd = new SqlCommand(\"DROP TABLE #temp_categories\", sqlConn))\n",
+					"    {\n",
+					"        dropTempTableCmd.ExecuteNonQuery();\n",
+					"    }\n",
+					"\n",
+					"    await sqlConn.CloseAsync();\n",
+					"}"
 				],
-				"execution_count": null
+				"execution_count": 78
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"var categories = jsnObj[\"categories\"];\n",
+					"\n",
+					"await InsertCategoriesAsync(categories);"
+				],
+				"execution_count": 83
 			}
 		]
 	}
