@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "19a3ab44-cb34-4d15-9045-83811c4cda7f"
+				"spark.autotune.trackingId": "17718a19-0feb-4004-b09a-42c0cfccd159"
 			}
 		},
 		"metadata": {
@@ -417,6 +417,9 @@
 				"source": [
 					"private async Task BulkInsertCategories(List<Category> categories)\n",
 					"{\n",
+					"    var uniqueCategories = new HashSet<(long Id, string Name)>(categories.Select(c => (c.Id, c.Name)));\n",
+					"    categories = uniqueCategories.Select(uc => new Category { Id = uc.Id, Name = uc.Name }).ToList();\n",
+					"\n",
 					"    await sqlConn.OpenAsync();\n",
 					"\n",
 					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
@@ -439,7 +442,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 171
+				"execution_count": 177
 			},
 			{
 				"cell_type": "code",
@@ -532,7 +535,9 @@
 					"\n",
 					"var categories = serengetiData.Categories;\n",
 					"var images = serengetiData.Images;\n",
-					"var annotations = serengetiData.Annotations;"
+					"var annotations = serengetiData.Annotations;\n",
+					"\n",
+					"Console.WriteLine($\"{categories.Count} Categories, {images.Count} images, {annotations.Count} annotations\");"
 				],
 				"execution_count": 173
 			},
@@ -571,7 +576,7 @@
 					"await BulkInsertAnnotations(annotations);\n",
 					""
 				],
-				"execution_count": 175
+				"execution_count": 178
 			},
 			{
 				"cell_type": "code",
