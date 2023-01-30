@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "19a3ab44-cb34-4d15-9045-83811c4cda7f"
+				"spark.autotune.trackingId": "afeaa660-e144-44fb-9caa-248ecd0aaa21"
 			}
 		},
 		"metadata": {
@@ -417,6 +417,9 @@
 				"source": [
 					"private async Task BulkInsertCategories(List<Category> categories)\n",
 					"{\n",
+					"    var uniqueCategories = new HashSet<(long Id, string Name)>(categories.Select(c => (c.Id, c.Name)));\n",
+					"    categories = uniqueCategories.Select(uc => new Category { Id = uc.Id, Name = uc.Name }).ToList();\n",
+					"\n",
 					"    await sqlConn.OpenAsync();\n",
 					"\n",
 					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
@@ -439,7 +442,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 171
+				"execution_count": 177
 			},
 			{
 				"cell_type": "code",
@@ -526,70 +529,20 @@
 					"    \"SnapshotSerengetiS11.json\",\n",
 					"};\n",
 					"\n",
-					"var blob=blobDirectory.GetBlockBlobReference(seasonFiles[0]);\n",
+					"foreach (var file in seasonFiles)\n",
+					"{\n",
+					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
+					"    var serengetiData=await ReadJsonFile(blob);\n",
 					"\n",
-					"var serengetiData=await ReadJsonFile(blob);\n",
+					"    await BulkInsertCategories(serengetiData.Categories);\n",
+					"    await BulkInsertImages(serengetiData.Images);\n",
+					"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
 					"\n",
-					"var categories = serengetiData.Categories;\n",
-					"var images = serengetiData.Images;\n",
-					"var annotations = serengetiData.Annotations;"
+					"    Console.WriteLine($\"Completed processing {file}\")\n",
+					"\n",
+					"}"
 				],
 				"execution_count": 173
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"await BulkInsertImages(images);"
-				],
-				"execution_count": 174
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"await BulkInsertAnnotations(annotations);\n",
-					""
-				],
-				"execution_count": 175
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"await BulkInsertCategories(categories);"
-				],
-				"execution_count": 176
 			}
 		]
 	}
