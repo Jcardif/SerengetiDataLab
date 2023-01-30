@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c3199534-8b6b-4652-9f8b-ef8c74944a8a"
+				"spark.autotune.trackingId": "4fc79f4e-5d7a-401c-8df0-89c24bc09df4"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 84
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -78,9 +78,146 @@
 					"using System.IO;\n",
 					"using Newtonsoft.Json;\n",
 					"using System.Data.SqlClient;\n",
+					"using System.Data;\n",
 					""
 				],
-				"execution_count": 85
+				"execution_count": 75
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"public class SerengetiData\n",
+					"{\n",
+					"    [JsonProperty(\"info\")]\n",
+					"    public Info Info { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"categories\")]\n",
+					"    public List<Category> Categories { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"images\")]\n",
+					"    public List<Image> Images { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"annotations\")]\n",
+					"    public List<Annotation> Annotations { get; set; }\n",
+					"}\n",
+					"\n",
+					"public class Annotation\n",
+					"{\n",
+					"    [JsonProperty(\"sequence_level_annotation\")]\n",
+					"    public bool SequenceLevelAnnotation { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"id\")]\n",
+					"    public string Id { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"category_id\")]\n",
+					"    public long CategoryId { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"seq_id\")]\n",
+					"    public string SeqId { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"season\")]\n",
+					"    public string Season { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"datetime\")]\n",
+					"    public DateTimeOffset Datetime { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"subject_id\")]\n",
+					"    public string SubjectId { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"count\")]\n",
+					"    public object Count { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"standing\")]\n",
+					"    public object Standing { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"resting\")]\n",
+					"    public object Resting { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"moving\")]\n",
+					"    public object Moving { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"interacting\")]\n",
+					"    public object Interacting { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"young_present\")]\n",
+					"    public object YoungPresent { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"image_id\")]\n",
+					"    public string ImageId { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"location\")]\n",
+					"    public string Location { get; set; }\n",
+					"}\n",
+					"\n",
+					"public class Category\n",
+					"{\n",
+					"    [JsonProperty(\"id\")]\n",
+					"    public long Id { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"name\")]\n",
+					"    public string Name { get; set; }\n",
+					"}\n",
+					"\n",
+					"public class Image\n",
+					"{\n",
+					"    [JsonProperty(\"id\")]\n",
+					"    public string Id { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"file_name\")]\n",
+					"    public string FileName { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"frame_num\")]\n",
+					"    public long FrameNum { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"seq_id\")]\n",
+					"    public string SeqId { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"width\")]\n",
+					"    public long Width { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"height\")]\n",
+					"    public long Height { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"corrupt\")]\n",
+					"    public bool Corrupt { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"location\")]\n",
+					"    public string Location { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"seq_num_frames\")]\n",
+					"    public long SeqNumFrames { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"datetime\")]\n",
+					"    public DateTimeOffset Datetime { get; set; }\n",
+					"}\n",
+					"\n",
+					"public class Info\n",
+					"{\n",
+					"    [JsonProperty(\"version\")]\n",
+					"    public string Version { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"description\")]\n",
+					"    public string Description { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"date_created\")]\n",
+					"    public long DateCreated { get; set; }\n",
+					"\n",
+					"    [JsonProperty(\"contributor\")]\n",
+					"    public string Contributor { get; set; }\n",
+					"}"
+				],
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -101,7 +238,7 @@
 					"SqlConnection sqlConn;\n",
 					"\n",
 					"\n",
-					"var sqlCon = new SqlConnection(connectionString);\n",
+					"var sqlCon = new SqlConnection(dbConnectionString);\n",
 					"\n",
 					"sqlCon.Open();\n",
 					"\n",
@@ -116,7 +253,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 87
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -132,7 +269,7 @@
 					}
 				},
 				"source": [
-					"private async Task<dynamic> ReadJsonFile (CloudBlockBlob jsonBlob)\n",
+					"private async Task<SerengetiData> ReadJsonFile (CloudBlockBlob jsonBlob)\n",
 					"{\n",
 					"    using (var memoryStream = new MemoryStream())\n",
 					"    {\n",
@@ -149,15 +286,13 @@
 					"            var jsonSerializer = new JsonSerializer();\n",
 					"\n",
 					"            // Read the JSON file in chunks and deserialize it\n",
-					"            dynamic jsonObject = jsonSerializer.Deserialize<dynamic>(jsonTextReader);\n",
-					"\n",
-					"            return jsonObject;\n",
+					"            return jsonSerializer.Deserialize<SerengetiData>(jsonTextReader);\n",
 					"        }\n",
 					"    }\n",
 					"}\n",
 					""
 				],
-				"execution_count": 88
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -203,7 +338,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 108
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -219,46 +354,51 @@
 					}
 				},
 				"source": [
-					"private async Task InsertCategoriesAsync(dynamic categories)\n",
+					"private async Task BulkInsertImages(List<Image> images)\n",
 					"{\n",
 					"    await sqlConn.OpenAsync();\n",
 					"\n",
-					"    // Create a temporary table to store the data you want to insert\n",
-					"    using (SqlCommand createTempTableCmd = new SqlCommand(\"CREATE TABLE #temp_categories (id INT, name VARCHAR(255));\", sqlConn))\n",
+					"    using(var bulkCpy = new SqlBulkCopy(sqlConn))\n",
 					"    {\n",
-					"        createTempTableCmd.ExecuteNonQuery();\n",
-					"    }\n",
+					"        bulkCpy.DestinationTableName=\"images\";\n",
 					"\n",
-					"    // Insert data into the temporary table\n",
-					"    string insertIntoTempTableCommand = \"INSERT INTO #temp_categories (id, name) VALUES (@id, @name)\";\n",
-					"    foreach (var category in categories)\n",
-					"    {\n",
-					"        using (SqlCommand insertIntoTempTableCmd = new SqlCommand(insertIntoTempTableCommand, sqlConn))\n",
+					"        var dataTable = new DataTable();\n",
+					"        dataTable.Columns.Add(\"id\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"file_name\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"frame_num\", typeof(long));\n",
+					"        dataTable.Columns.Add(\"seq_id\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"width\", typeof(long));\n",
+					"        dataTable.Columns.Add(\"height\", typeof(long));\n",
+					"        dataTable.Columns.Add(\"corrupt\", typeof(bool));\n",
+					"        dataTable.Columns.Add(\"location\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"seq_num_frames\", typeof(long));\n",
+					"        dataTable.Columns.Add(\"datetime\", typeof(DateTime));\n",
+					"\n",
+					"        foreach (var image in images)\n",
 					"        {\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@id\", (string)category[\"id\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@name\", (string)category[\"name\"]);\n",
+					"            var row = dataTable.NewRow();\n",
+					"            row[\"id\"] = image.Id;\n",
+					"            row[\"file_name\"] = image.FileName;\n",
+					"            row[\"frame_num\"] = image.FrameNum;\n",
+					"            row[\"seq_id\"] = image.SeqId;\n",
+					"            row[\"width\"] = image.Width;\n",
+					"            row[\"height\"] = image.Height;\n",
+					"            row[\"corrupt\"] = image.Corrupt;\n",
+					"            row[\"location\"] = image.Location;\n",
+					"            row[\"seq_num_frames\"] = image.SeqNumFrames;\n",
+					"            row[\"datetime\"] = image.Datetime.DateTime;\n",
 					"\n",
-					"            insertIntoTempTableCmd.ExecuteNonQuery();\n",
+					"            dataTable.Rows.Add(row);\n",
 					"        }\n",
-					"    }\n",
 					"\n",
-					"    // Insert only unique records into the target table\n",
-					"    string insertIntoCategoriesCommand = \"INSERT INTO categories (id, name) SELECT id, name FROM #temp_categories WHERE NOT EXISTS (SELECT 1 FROM categories WHERE categories.id = #temp_categories.id)\";\n",
-					"    using (SqlCommand insertIntoCategoriesCmd = new SqlCommand(insertIntoCategoriesCommand, sqlConn))\n",
-					"    {\n",
-					"        await insertIntoCategoriesCmd.ExecuteNonQueryAsync();\n",
-					"    }\n",
-					"\n",
-					"    // Drop the temporary table\n",
-					"    using (SqlCommand dropTempTableCmd = new SqlCommand(\"DROP TABLE #temp_categories\", sqlConn))\n",
-					"    {\n",
-					"        dropTempTableCmd.ExecuteNonQuery();\n",
+					"        await Task.Run(() => bulkCpy.WriteToServer(dataTable));\n",
 					"    }\n",
 					"\n",
 					"    await sqlConn.CloseAsync();\n",
-					"}"
+					"}\n",
+					""
 				],
-				"execution_count": 96
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -274,55 +414,31 @@
 					}
 				},
 				"source": [
-					"private async Task InsertImagesAsync(dynamic images)\n",
+					"private async Task BulkInsertCategories(List<Category> categories)\n",
 					"{\n",
 					"    await sqlConn.OpenAsync();\n",
 					"\n",
-					"    // Create a temporary table to store the data you want to insert\n",
-					"    using (SqlCommand createTempTableCmd = new SqlCommand(\"CREATE TABLE #temp_images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\", sqlConn))\n",
+					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
 					"    {\n",
-					"        createTempTableCmd.ExecuteNonQuery();\n",
-					"    }\n",
+					"        bulkCpy.DestinationTableName = \"categories\";\n",
 					"\n",
-					"    // Insert data into the temporary table\n",
-					"    string insertIntoTempTableCommand = \"INSERT INTO #temp_images (id, file_name, frame_num, seq_id, width, height, corrupt, location, seq_num_frames, datetime) VALUES (@id, @file_name, @frame_num, @seq_id, @width, @height, @corrupt, @location, @seq_num_frames, @datetime)\";\n",
-					"    foreach (var image in images)\n",
-					"    {\n",
-					"        using (SqlCommand insertIntoTempTableCmd = new SqlCommand(insertIntoTempTableCommand, sqlConn))\n",
+					"        var dataTable = new DataTable();\n",
+					"        dataTable.Columns.Add(\"id\", typeof(long));\n",
+					"        dataTable.Columns.Add(\"name\", typeof(string));\n",
+					"\n",
+					"        foreach (var category in categories)\n",
 					"        {\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@id\", (string)image[\"id\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@file_name\", (string)image[\"file_name\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@frame_num\", (int)image[\"frame_num\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@seq_id\", (string)image[\"seq_id\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@width\", (int)image[\"width\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@height\", (int)image[\"height\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@corrupt\", (bool)image[\"corrupt\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@location\", (string)image[\"location\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@seq_num_frames\", (int)image[\"seq_num_frames\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@datetime\", (DateTime)image[\"datetime\"]);\n",
-					"\n",
-					"            insertIntoTempTableCmd.ExecuteNonQuery();\n",
+					"            dataTable.Rows.Add(category.Id, category.Name);\n",
 					"        }\n",
-					"    }\n",
 					"\n",
-					"    // Insert only unique records into the target table\n",
-					"    string insertIntoImagesCommand = \"INSERT INTO images (id, file_name, frame_num, seq_id, width, height, corrupt, location, seq_num_frames, datetime) SELECT id, file_name, frame_num, seq_id, width, height, corrupt, location, seq_num_frames, datetime FROM #temp_images WHERE NOT EXISTS (SELECT 1 FROM images WHERE images.id = #temp_images.id)\";\n",
-					"    using (SqlCommand insertIntoImagesCmd = new SqlCommand(insertIntoImagesCommand, sqlConn))\n",
-					"    {\n",
-					"        await insertIntoImagesCmd.ExecuteNonQueryAsync();\n",
+					"        await bulkCpy.WriteToServerAsync(dataTable);\n",
 					"    }\n",
-					"    // Drop the temporary table\n",
-					"    using (SqlCommand dropTempTableCmd = new SqlCommand(\"DROP TABLE #temp_images\", sqlConn))\n",
-					"    {\n",
-					"        dropTempTableCmd.ExecuteNonQuery();\n",
-					"    }\n",
-					"\n",
 					"\n",
 					"    await sqlConn.CloseAsync();\n",
-					"\n",
-					"}"
+					"}\n",
+					""
 				],
-				"execution_count": 99
+				"execution_count": 81
 			},
 			{
 				"cell_type": "code",
@@ -338,59 +454,59 @@
 					}
 				},
 				"source": [
-					"private async Task InsertAnnotationsAsync(dynamic annotations)\n",
+					"private async Task BulkInsertAnnotations(List<Annotation> annotations)\n",
 					"{\n",
 					"    await sqlConn.OpenAsync();\n",
 					"\n",
-					"    // Create a temporary table to store the data you want to insert\n",
-					"    using (SqlCommand createTempTableCmd = new SqlCommand(\"CREATE TABLE #temp_annotations (id VARCHAR(255), category_id INT, seq_id VARCHAR(255), season VARCHAR(255), datetime DATETIME, subject_id VARCHAR(255), count VARCHAR(255), standing FLOAT, resting FLOAT, moving FLOAT, interacting FLOAT, young_present FLOAT, image_id VARCHAR(255), location VARCHAR(255));\", sqlConn))\n",
+					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
 					"    {\n",
-					"        createTempTableCmd.ExecuteNonQuery();\n",
-					"    }\n",
+					"        bulkCpy.DestinationTableName = \"annotations\";\n",
 					"\n",
-					"    // Insert data into the temporary table\n",
-					"    string insertIntoTempTableCommand = \"INSERT INTO #temp_annotations (id, category_id, seq_id, season, datetime, subject_id, count, standing, resting, moving, interacting, young_present, image_id, location) VALUES (@id, @category_id, @seq_id, @season, @datetime, @subject_id, @count, @standing, @resting, @moving, @interacting, @young_present, @image_id, @location)\";\n",
-					"    foreach (var annotation in annotations)\n",
-					"    {\n",
-					"        using (SqlCommand insertIntoTempTableCmd = new SqlCommand(insertIntoTempTableCommand, sqlConn))\n",
+					"        var dataTable = new DataTable();\n",
+					"        dataTable.Columns.Add(\"SequenceLevelAnnotation\", typeof(bool));\n",
+					"        dataTable.Columns.Add(\"Id\", typeof(Guid));\n",
+					"        dataTable.Columns.Add(\"CategoryId\", typeof(long));\n",
+					"        dataTable.Columns.Add(\"SeqId\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"Season\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"Datetime\", typeof(DateTime));\n",
+					"        dataTable.Columns.Add(\"SubjectId\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"Count\", typeof(object));\n",
+					"        dataTable.Columns.Add(\"Standing\", typeof(object));\n",
+					"        dataTable.Columns.Add(\"Resting\", typeof(object));\n",
+					"        dataTable.Columns.Add(\"Moving\", typeof(object));\n",
+					"        dataTable.Columns.Add(\"Interacting\", typeof(object));\n",
+					"        dataTable.Columns.Add(\"YoungPresent\", typeof(object));\n",
+					"        dataTable.Columns.Add(\"ImageId\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"Location\", typeof(string));\n",
+					"\n",
+					"        foreach (var annotation in annotations)\n",
 					"        {\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@id\", (string)annotation[\"id\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@category_id\", (int)annotation[\"category_id\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@seq_id\", (string)annotation[\"seq_id\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@season\", (string)annotation[\"season\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@datetime\", (DateTime)annotation[\"datetime\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@subject_id\", (string)annotation[\"subject_id\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@count\", (string)annotation[\"count\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@standing\", (float)annotation[\"standing\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@resting\", (float)annotation[\"resting\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@moving\", (float)annotation[\"moving\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@interacting\", (float)annotation[\"interacting\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@young_present\", (float)annotation[\"young_present\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@image_id\", (string)annotation[\"image_id\"]);\n",
-					"            insertIntoTempTableCmd.Parameters.AddWithValue(\"@location\", (string)annotation[\"location\"]);\n",
-					"\n",
-					"            insertIntoTempTableCmd.ExecuteNonQuery();\n",
+					"            var row = dataTable.NewRow();\n",
+					"            row[\"SequenceLevelAnnotation\"] = annotation.SequenceLevelAnnotation;\n",
+					"            row[\"Id\"] = annotation.Id;\n",
+					"            row[\"CategoryId\"] = annotation.CategoryId;\n",
+					"            row[\"SeqId\"] = annotation.SeqId;\n",
+					"            row[\"Season\"] = annotation.Season;\n",
+					"            row[\"Datetime\"] = annotation.Datetime.LocalDateTime;\n",
+					"            row[\"SubjectId\"] = annotation.SubjectId;\n",
+					"            row[\"Count\"] = annotation.Count;\n",
+					"            row[\"Standing\"] = annotation.Standing;\n",
+					"            row[\"Resting\"] = annotation.Resting;\n",
+					"            row[\"Moving\"] = annotation.Moving;\n",
+					"            row[\"Interacting\"] = annotation.Interacting;\n",
+					"            row[\"YoungPresent\"] = annotation.YoungPresent;\n",
+					"            row[\"ImageId\"] = annotation.ImageId;\n",
+					"            row[\"Location\"] = annotation.Location;\n",
+					"            dataTable.Rows.Add(row);\n",
 					"        }\n",
 					"\n",
-					"\n",
+					"        await bulkCpy.WriteToServerAsync(dataTable);\n",
 					"    }\n",
-					"\n",
-					"    // Insert only unique records into the target table\n",
-					"    using (SqlCommand insertIntoTargetTableCmd = new SqlCommand(\"INSERT INTO annotations (id, category_id, seq_id, season, datetime, subject_id, count, standing, resting, moving, interacting, young_present, image_id, location) SELECT id, category_id, seq_id, season, datetime, subject_id, count, standing, resting, moving, interacting, young_present, image_id, location FROM #temp_annotations WHERE NOT EXISTS (SELECT * FROM annotations WHERE id = #temp_annotations.id);\", sqlConn))\n",
-					"    {\n",
-					"        insertIntoTargetTableCmd.ExecuteNonQuery();\n",
-					"    }\n",
-					"\n",
-					"    // Drop the temporary table\n",
-					"    using (SqlCommand dropTempTableCmd = new SqlCommand(\"DROP TABLE #temp_annotations\", sqlConn))\n",
-					"    {\n",
-					"        dropTempTableCmd.ExecuteNonQuery();\n",
-					"    }\n",
-					"\n",
 					"    await sqlConn.CloseAsync();\n",
-					"}"
+					"}\n",
+					""
 				],
-				"execution_count": 100
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -427,9 +543,15 @@
 					"\n",
 					"var blob=blobDirectory.GetBlockBlobReference(seasonFiles[0]);\n",
 					"\n",
-					"var jsnObj=await ReadJsonFile(blob);"
+					"var serengetiData=await ReadJsonFile(blob);\n",
+					"\n",
+					"var categories = serengetiData.Categories;\n",
+					"var images = serengetiData.Images;\n",
+					"var annotations = serengetiData.Annotations;\n",
+					"\n",
+					"Console.WriteLine($\"{categories.Count} Categories, {images.Count} images, {annotations.Count} annotations\");"
 				],
-				"execution_count": 109
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -445,13 +567,46 @@
 					}
 				},
 				"source": [
-					"var categories = jsnObj[\"categories\"];\n",
-					"var images = jsnObj[\"images\"];\n",
-					"\n",
-					"await InsertCategoriesAsync(categories);\n",
-					"await InsertImagesAsync(images);"
+					"await BulkInsertImages(images);"
 				],
-				"execution_count": 111
+				"execution_count": 84
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"await BulkInsertAnnotations(annotations);\n",
+					""
+				],
+				"execution_count": 85
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"await BulkInsertCategories(categories);"
+				],
+				"execution_count": null
 			}
 		]
 	}
