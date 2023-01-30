@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "17718a19-0feb-4004-b09a-42c0cfccd159"
+				"spark.autotune.trackingId": "afeaa660-e144-44fb-9caa-248ecd0aaa21"
 			}
 		},
 		"metadata": {
@@ -529,72 +529,20 @@
 					"    \"SnapshotSerengetiS11.json\",\n",
 					"};\n",
 					"\n",
-					"var blob=blobDirectory.GetBlockBlobReference(seasonFiles[0]);\n",
+					"foreach (var file in seasonFiles)\n",
+					"{\n",
+					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
+					"    var serengetiData=await ReadJsonFile(blob);\n",
 					"\n",
-					"var serengetiData=await ReadJsonFile(blob);\n",
+					"    await BulkInsertCategories(serengetiData.Categories);\n",
+					"    await BulkInsertImages(serengetiData.Images);\n",
+					"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
 					"\n",
-					"var categories = serengetiData.Categories;\n",
-					"var images = serengetiData.Images;\n",
-					"var annotations = serengetiData.Annotations;\n",
+					"    Console.WriteLine($\"Completed processing {file}\")\n",
 					"\n",
-					"Console.WriteLine($\"{categories.Count} Categories, {images.Count} images, {annotations.Count} annotations\");"
+					"}"
 				],
 				"execution_count": 173
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"await BulkInsertImages(images);"
-				],
-				"execution_count": 174
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"await BulkInsertAnnotations(annotations);\n",
-					""
-				],
-				"execution_count": 178
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"await BulkInsertCategories(categories);"
-				],
-				"execution_count": 176
 			}
 		]
 	}
