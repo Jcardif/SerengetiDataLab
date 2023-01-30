@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4fc79f4e-5d7a-401c-8df0-89c24bc09df4"
+				"spark.autotune.trackingId": "19a3ab44-cb34-4d15-9045-83811c4cda7f"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 74
+				"execution_count": 164
 			},
 			{
 				"cell_type": "code",
@@ -81,7 +81,7 @@
 					"using System.Data;\n",
 					""
 				],
-				"execution_count": 75
+				"execution_count": 165
 			},
 			{
 				"cell_type": "code",
@@ -217,7 +217,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 76
+				"execution_count": 166
 			},
 			{
 				"cell_type": "code",
@@ -238,9 +238,10 @@
 					"SqlConnection sqlConn;\n",
 					"\n",
 					"\n",
+					"\n",
 					"var sqlCon = new SqlConnection(dbConnectionString);\n",
 					"\n",
-					"sqlCon.Open();\n",
+					"sqlCon.OpenAsync();\n",
 					"\n",
 					"private void InitStorageAndDb()\n",
 					"{\n",
@@ -253,7 +254,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 77
+				"execution_count": 167
 			},
 			{
 				"cell_type": "code",
@@ -292,7 +293,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 78
+				"execution_count": 168
 			},
 			{
 				"cell_type": "code",
@@ -314,7 +315,7 @@
 					"    {\n",
 					"        {\"images\", \"CREATE TABLE images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\"},\n",
 					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(255));\"},\n",
-					"        {\"annotations\", \"CREATE TABLE annotations (id VARCHAR(36) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(20) NOT NULL, season VARCHAR(2) NOT NULL, datetime DATETIME NOT NULL, subject_id VARCHAR(10) NOT NULL, count INT NOT NULL, standing DECIMAL(4, 2) NOT NULL, resting DECIMAL(4, 2) NOT NULL, moving DECIMAL(4, 2) NOT NULL, interacting DECIMAL(4, 2) NOT NULL, young_present DECIMAL(4, 2) NOT NULL, image_id VARCHAR(50) NOT NULL, location VARCHAR(3) NOT NULL, sequence_level_annotation BIT NOT NULL)\"}\n",
+					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(2) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"}\n",
 					"    };\n",
 					"\n",
 					"    await sqlConn.OpenAsync();\n",
@@ -338,7 +339,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 79
+				"execution_count": 169
 			},
 			{
 				"cell_type": "code",
@@ -398,7 +399,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 80
+				"execution_count": 170
 			},
 			{
 				"cell_type": "code",
@@ -438,7 +439,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 81
+				"execution_count": 171
 			},
 			{
 				"cell_type": "code",
@@ -463,40 +464,24 @@
 					"        bulkCpy.DestinationTableName = \"annotations\";\n",
 					"\n",
 					"        var dataTable = new DataTable();\n",
-					"        dataTable.Columns.Add(\"SequenceLevelAnnotation\", typeof(bool));\n",
-					"        dataTable.Columns.Add(\"Id\", typeof(Guid));\n",
-					"        dataTable.Columns.Add(\"CategoryId\", typeof(long));\n",
-					"        dataTable.Columns.Add(\"SeqId\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"Season\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"Datetime\", typeof(DateTime));\n",
-					"        dataTable.Columns.Add(\"SubjectId\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"Count\", typeof(object));\n",
-					"        dataTable.Columns.Add(\"Standing\", typeof(object));\n",
-					"        dataTable.Columns.Add(\"Resting\", typeof(object));\n",
-					"        dataTable.Columns.Add(\"Moving\", typeof(object));\n",
-					"        dataTable.Columns.Add(\"Interacting\", typeof(object));\n",
-					"        dataTable.Columns.Add(\"YoungPresent\", typeof(object));\n",
-					"        dataTable.Columns.Add(\"ImageId\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"Location\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"id\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"category_id\", typeof(long));\n",
+					"        dataTable.Columns.Add(\"seq_id\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"season\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"datetime\", typeof(DateTime));\n",
+					"        dataTable.Columns.Add(\"image_id\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"location\", typeof(string));\n",
 					"\n",
 					"        foreach (var annotation in annotations)\n",
 					"        {\n",
 					"            var row = dataTable.NewRow();\n",
-					"            row[\"SequenceLevelAnnotation\"] = annotation.SequenceLevelAnnotation;\n",
-					"            row[\"Id\"] = annotation.Id;\n",
-					"            row[\"CategoryId\"] = annotation.CategoryId;\n",
-					"            row[\"SeqId\"] = annotation.SeqId;\n",
-					"            row[\"Season\"] = annotation.Season;\n",
-					"            row[\"Datetime\"] = annotation.Datetime.LocalDateTime;\n",
-					"            row[\"SubjectId\"] = annotation.SubjectId;\n",
-					"            row[\"Count\"] = annotation.Count;\n",
-					"            row[\"Standing\"] = annotation.Standing;\n",
-					"            row[\"Resting\"] = annotation.Resting;\n",
-					"            row[\"Moving\"] = annotation.Moving;\n",
-					"            row[\"Interacting\"] = annotation.Interacting;\n",
-					"            row[\"YoungPresent\"] = annotation.YoungPresent;\n",
-					"            row[\"ImageId\"] = annotation.ImageId;\n",
-					"            row[\"Location\"] = annotation.Location;\n",
+					"            row[\"id\"] = annotation.Id;\n",
+					"            row[\"category_id\"] = annotation.CategoryId;\n",
+					"            row[\"seq_id\"] = annotation.SeqId;\n",
+					"            row[\"season\"] = annotation.Season;\n",
+					"            row[\"datetime\"] = annotation.Datetime.LocalDateTime;\n",
+					"            row[\"image_id\"] = annotation.ImageId;\n",
+					"            row[\"location\"] = annotation.Location;\n",
 					"            dataTable.Rows.Add(row);\n",
 					"        }\n",
 					"\n",
@@ -506,7 +491,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 82
+				"execution_count": 172
 			},
 			{
 				"cell_type": "code",
@@ -547,11 +532,9 @@
 					"\n",
 					"var categories = serengetiData.Categories;\n",
 					"var images = serengetiData.Images;\n",
-					"var annotations = serengetiData.Annotations;\n",
-					"\n",
-					"Console.WriteLine($\"{categories.Count} Categories, {images.Count} images, {annotations.Count} annotations\");"
+					"var annotations = serengetiData.Annotations;"
 				],
-				"execution_count": 83
+				"execution_count": 173
 			},
 			{
 				"cell_type": "code",
@@ -569,7 +552,7 @@
 				"source": [
 					"await BulkInsertImages(images);"
 				],
-				"execution_count": 84
+				"execution_count": 174
 			},
 			{
 				"cell_type": "code",
@@ -588,7 +571,7 @@
 					"await BulkInsertAnnotations(annotations);\n",
 					""
 				],
-				"execution_count": 85
+				"execution_count": 175
 			},
 			{
 				"cell_type": "code",
@@ -606,7 +589,7 @@
 				"source": [
 					"await BulkInsertCategories(categories);"
 				],
-				"execution_count": null
+				"execution_count": 176
 			}
 		]
 	}
