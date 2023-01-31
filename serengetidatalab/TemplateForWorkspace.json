@@ -150,15 +150,15 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "95e83c7f-3676-4924-a5ec-53650e3cb1a2"
+						"spark.autotune.trackingId": "bdd652c2-06a3-4088-b985-e355e4a8c1f8"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
+						"name": "synapse_sparkdotnet",
+						"display_name": "csharp"
 					},
 					"language_info": {
 						"name": "csharp"
@@ -175,7 +175,8 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56
+						"memory": 56,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -477,7 +478,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f87298e7-8b19-47a3-9294-1f4a080a7775"
+						"spark.autotune.trackingId": "757f8824-b9d9-49af-92fe-304a2b457d51"
 					}
 				},
 				"metadata": {
@@ -502,15 +503,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#r \"nuget: Microsoft.Azure.Storage.Common\"\n",
 							"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
