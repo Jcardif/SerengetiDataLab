@@ -8,8 +8,11 @@
 		"serengetidatalab-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"SerengetiVault_properties_typeProperties_baseUrl": {
+			"value": "https://VaultSerengeti.vault.azure.net/"
+		},
 		"serengetidatalab-WorkspaceDefaultStorage_properties_typeProperties_url": {
-			"value": "https://serenegetidatastore.dfs.core.windows.net"
+			"value": "https://serengeti.dfs.core.windows.net"
 		}
 	}
 }
