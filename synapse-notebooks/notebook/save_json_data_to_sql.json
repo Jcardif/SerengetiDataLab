@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7a4a1ceb-0c00-4c55-98c5-a947e32b4e25"
+				"spark.autotune.trackingId": "df8cdab4-4704-44a2-bfdb-0415d47b6290"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 49
+				"execution_count": 93
 			},
 			{
 				"cell_type": "code",
@@ -81,7 +81,7 @@
 					"using System.Data;\n",
 					""
 				],
-				"execution_count": 50
+				"execution_count": 94
 			},
 			{
 				"cell_type": "code",
@@ -217,7 +217,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 51
+				"execution_count": 95
 			},
 			{
 				"cell_type": "code",
@@ -237,6 +237,8 @@
 					"CloudBlobDirectory blobDirectory;\n",
 					"SqlConnection sqlConn;\n",
 					"\n",
+					"var dbConnectionString = \"Server=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=defdedicated;Persist Security Info=False;User ID=sqladminuser;Password=3dd522a1-2e00-4cf1-8944-ccd1c51cd9bb;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;\";\n",
+					"var storageConnectionString = \"DefaultEndpointsProtocol=https;AccountName=serenegetidatastore;AccountKey=gEpCGp8amfM8xDIpfN+YmUerpWJ+V8QGYlawRyG8OFs5Z3LaTaotmWc+oaZI2YcTcTNzzhmTAh01+ASt4/MJKQ==;EndpointSuffix=core.windows.net\";\n",
 					"\n",
 					"var sqlCon = new SqlConnection(dbConnectionString);\n",
 					"\n",
@@ -253,7 +255,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 52
+				"execution_count": 96
 			},
 			{
 				"cell_type": "code",
@@ -292,7 +294,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 53
+				"execution_count": 97
 			},
 			{
 				"cell_type": "code",
@@ -312,9 +314,9 @@
 					"{\n",
 					"    var commands = new Dictionary<string, string>()\n",
 					"    {\n",
-					"        {\"images\", \"CREATE TABLE images (id VARCHAR(MAX), file_name VARCHAR(MAX), frame_num INT, seq_id VARCHAR(MAX), width INT, height INT, corrupt BIT, location VARCHAR(MAX), seq_num_frames INT, datetime DATETIME);\"},\n",
-					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(MAX));\"},\n",
-					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(MAX) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(MAX) NOT NULL, season VARCHAR(2) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(MAX) NOT NULL, location VARCHAR(MAX) NOT NULL );\"}\n",
+					"        {\"images\", \"CREATE TABLE images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\"},\n",
+					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(255));\"},\n",
+					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(255) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"}\n",
 					"    };\n",
 					"\n",
 					"    await sqlConn.OpenAsync();\n",
@@ -338,7 +340,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 54
+				"execution_count": 98
 			},
 			{
 				"cell_type": "code",
@@ -398,7 +400,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 55
+				"execution_count": 99
 			},
 			{
 				"cell_type": "code",
@@ -440,7 +442,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 59
+				"execution_count": 100
 			},
 			{
 				"cell_type": "code",
@@ -492,7 +494,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 57
+				"execution_count": 101
 			},
 			{
 				"cell_type": "code",
@@ -511,38 +513,35 @@
 					"InitStorageAndDb();\n",
 					"await CreateTablesAsync();\n",
 					"\n",
-					"//season files\n",
-					"var seasonFiles = new string[]\n",
-					"{\n",
-					"    \"SnapshotSerengetiS01.json\",\n",
-					"    \"SnapshotSerengetiS02.json\",\n",
-					"    \"SnapshotSerengetiS03.json\",\n",
-					"    \"SnapshotSerengetiS04.json\",\n",
-					"    \"SnapshotSerengetiS05.json\",\n",
-					"    \"SnapshotSerengetiS06.json\",\n",
-					"    \"SnapshotSerengetiS07.json\",\n",
-					"    \"SnapshotSerengetiS08.json\",\n",
-					"    \"SnapshotSerengetiS09.json\",\n",
-					"    \"SnapshotSerengetiS10.json\",\n",
-					"    \"SnapshotSerengetiS11.json\",\n",
-					"};\n",
-					"\n",
-					"foreach (var file in seasonFiles)\n",
-					"{\n",
-					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
-					"    var serengetiData=await ReadJsonFile(blob);\n",
-					"\n",
-					"    if(Array.IndexOf(seasonFiles, file)==0)\n",
-					"        await BulkInsertCategories(serengetiData.Categories);\n",
-					"        \n",
-					"    await BulkInsertImages(serengetiData.Images);\n",
-					"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
-					"\n",
-					"    Console.WriteLine($\"Completed processing {file}\");\n",
-					"\n",
-					"}"
+					"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiS11.json\");\n",
+					"var serengetiData=await ReadJsonFile(blob);\n",
+					"await BulkInsertCategories(serengetiData.Categories);\n",
+					"await BulkInsertImages(serengetiData.Images);"
 				],
-				"execution_count": 58
+				"execution_count": 102
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"await sqlConn.CloseAsync();\n",
+					"var subset = serengetiData.Annotations.Skip(0).Take(1).ToList();\n",
+					"\n",
+					"Console.WriteLine(JsonConvert.SerializeObject(subset, Formatting.Indented));\n",
+					"\n",
+					"await BulkInsertAnnotations(subset);"
+				],
+				"execution_count": 107
 			}
 		]
 	}
