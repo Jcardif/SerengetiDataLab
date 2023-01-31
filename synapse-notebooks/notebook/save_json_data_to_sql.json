@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f3c70e3f-8e91-4e73-9e57-74b12dfe74c7"
+				"spark.autotune.trackingId": "cfa077fd-5b81-4ca3-87a3-ede1f36f762a"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 205
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -79,9 +79,10 @@
 					"using Newtonsoft.Json;\n",
 					"using System.Data.SqlClient;\n",
 					"using System.Data;\n",
-					""
+					"\n",
+					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
 				],
-				"execution_count": 206
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -237,8 +238,11 @@
 					"CloudBlobDirectory blobDirectory;\n",
 					"SqlConnection sqlConn;\n",
 					"\n",
-					"var dbConnectionString = \"\";\n",
-					"var storageConnectionString = \"\";\n",
+					"var accountKey = Credentials.GetSecret(\"VaultSerengeti\",\"ADLS-AccessKey\");\n",
+					"string storageConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";\n",
+					"\n",
+					"var password = Credentials.GetSecret(\"VaultSerengeti\",\"SqlPoolPassword\");\n",
+					"var dbConnectionString = \"Server=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=dedicateddef;Persist Security Info=False;User ID=undefined;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;\";\n",
 					"\n",
 					"var sqlCon = new SqlConnection(dbConnectionString);\n",
 					"\n",
@@ -255,7 +259,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 208
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",

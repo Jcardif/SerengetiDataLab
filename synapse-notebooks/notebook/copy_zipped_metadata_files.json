@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "70dc3a65-5543-4107-92c3-5c5caec21011"
+				"spark.autotune.trackingId": "95e83c7f-3676-4924-a5ec-53650e3cb1a2"
 			}
 		},
 		"metadata": {
@@ -67,7 +67,7 @@
 					"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
 					"#r \"nuget: Microsoft.Azure.Storage.File\""
 				],
-				"execution_count": 115
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -85,18 +85,16 @@
 				"source": [
 					"using Microsoft.Azure.Storage;\n",
 					"using Microsoft.Azure.Storage.Blob;\n",
-					"using Microsoft.Azure.Storage.DataMovement;\n",
 					"using Microsoft.Azure.Storage.File;\n",
 					"using System.IO;\n",
 					"using System.IO.Compression;\n",
-					"using Azure.Identity;\n",
 					"\n",
 					"using CopyStatus = Microsoft.Azure.Storage.Blob.CopyStatus;\n",
 					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Utils;\n",
 					"using Microsoft.Azure.Storage.Auth;\n",
-					""
+					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
 				],
-				"execution_count": 116
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -115,9 +113,10 @@
 					"CloudBlobContainer destContainer, sourceContainer;\n",
 					"CloudBlobDirectory destDirectory;\n",
 					"\n",
-					"string destConnectionString = \"\";"
+					"var accountKey = Credentials.GetSecret(\"VaultSerengeti\",\"ADLS-AccessKey\");\n",
+					"string destConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";"
 				],
-				"execution_count": 117
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
