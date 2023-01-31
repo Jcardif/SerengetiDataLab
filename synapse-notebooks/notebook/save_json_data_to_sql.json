@@ -13,20 +13,19 @@
 			"executorMemory": "56g",
 			"executorCores": 8,
 			"numExecutors": 2,
-			"runAsWorkspaceSystemIdentity": false,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cfa077fd-5b81-4ca3-87a3-ede1f36f762a"
+				"spark.autotune.trackingId": "757f8824-b9d9-49af-92fe-304a2b457d51"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_sparkdotnet",
-				"display_name": "csharp"
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "csharp"
@@ -38,14 +37,13 @@
 				"endpoint": "https://serengetidatalab.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/DefaultPool",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.3",
 				"nodeCount": 10,
 				"cores": 8,
 				"memory": 56,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
