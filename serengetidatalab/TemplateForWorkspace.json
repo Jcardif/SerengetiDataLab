@@ -129,147 +129,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "DefaultPool",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "56g",
-					"driverCores": 8,
-					"executorMemory": "56g",
-					"executorCores": 8,
-					"numExecutors": 2,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9ba1a922-4f3b-4f46-92da-ef0d38c6a524"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_sparkdotnet",
-						"display_name": "csharp"
-					},
-					"language_info": {
-						"name": "csharp"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/SerengetiDataLab/providers/Microsoft.Synapse/workspaces/serengetidatalab/bigDataPools/DefaultPool",
-						"name": "DefaultPool",
-						"type": "Spark",
-						"endpoint": "https://serengetidatalab.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/DefaultPool",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net"
-						},
-						"sparkVersion": "3.3",
-						"nodeCount": 10,
-						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
-							"#r \"nuget: Microsoft.Azure.Services.AppAuthentication\"\n",
-							"#r \"nuget: Microsoft.Azure.KeyVault\""
-						],
-						"outputs": [],
-						"execution_count": 6
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"using Microsoft.Azure.Services.AppAuthentication;\n",
-							"using Microsoft.Azure.KeyVault;"
-						],
-						"outputs": [],
-						"execution_count": 7
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Utils;\n",
-							"\n",
-							"string connectionString = TokenLibrary.GetConnectionString(\"SerengetiVault\");\n",
-							"Console.WriteLine(connectionString);"
-						],
-						"outputs": [],
-						"execution_count": 12
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"var keyVaultUrl= \"https://vaultserengeti.vault.azure.net/\";\n",
-							"var secretName = \"SqlPoolConnectionStrring\";\n",
-							"\n",
-							"// Authenticate the request using a service principal or a managed identity\n",
-							"var azureServiceTokenProvider = new AzureServiceTokenProvider();\n",
-							"var accessToken = await azureServiceTokenProvider.GetAccessTokenAsync(\"https://vault.azure.net\");\n",
-							"\n",
-							"// Create the Key Vault client\n",
-							"var keyVaultClient = new KeyVaultClient(\n",
-							"    (authority, resource, scope) =>\n",
-							"        azureServiceTokenProvider.KeyVaultTokenCallback(authority, resource, scope));\n",
-							"\n",
-							"// Get the secret value\n",
-							"var secret = await keyVaultClient.GetSecretAsync(keyVaultUrl, secretName);\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 15
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/copy_zipped_metadata_files')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -291,15 +150,15 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "799c4b3d-b5c5-447f-a24e-06f3d14a68ed"
+						"spark.autotune.trackingId": "95e83c7f-3676-4924-a5ec-53650e3cb1a2"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_sparkdotnet",
-						"display_name": "csharp"
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
 					},
 					"language_info": {
 						"name": "csharp"
@@ -316,8 +175,7 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -341,7 +199,7 @@
 							"#r \"nuget: Microsoft.Azure.Storage.File\""
 						],
 						"outputs": [],
-						"execution_count": 115
+						"execution_count": 1
 					},
 					{
 						"cell_type": "code",
@@ -359,19 +217,17 @@
 						"source": [
 							"using Microsoft.Azure.Storage;\n",
 							"using Microsoft.Azure.Storage.Blob;\n",
-							"using Microsoft.Azure.Storage.DataMovement;\n",
 							"using Microsoft.Azure.Storage.File;\n",
 							"using System.IO;\n",
 							"using System.IO.Compression;\n",
-							"using Azure.Identity;\n",
 							"\n",
 							"using CopyStatus = Microsoft.Azure.Storage.Blob.CopyStatus;\n",
 							"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Utils;\n",
 							"using Microsoft.Azure.Storage.Auth;\n",
-							""
+							"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
 						],
 						"outputs": [],
-						"execution_count": 116
+						"execution_count": 6
 					},
 					{
 						"cell_type": "code",
@@ -390,10 +246,11 @@
 							"CloudBlobContainer destContainer, sourceContainer;\n",
 							"CloudBlobDirectory destDirectory;\n",
 							"\n",
-							"string destConnectionString = \"\";"
+							"var accountKey = Credentials.GetSecret(\"VaultSerengeti\",\"ADLS-AccessKey\");\n",
+							"string destConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";"
 						],
 						"outputs": [],
-						"execution_count": 117
+						"execution_count": 7
 					},
 					{
 						"cell_type": "code",
@@ -620,7 +477,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f3c70e3f-8e91-4e73-9e57-74b12dfe74c7"
+						"spark.autotune.trackingId": "f87298e7-8b19-47a3-9294-1f4a080a7775"
 					}
 				},
 				"metadata": {
@@ -645,13 +502,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56
+						"memory": 56,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#r \"nuget: Microsoft.Azure.Storage.Common\"\n",
 							"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
@@ -660,7 +519,7 @@
 							"#r \"nuget: System.Data.SqlClient\""
 						],
 						"outputs": [],
-						"execution_count": 205
+						"execution_count": 1
 					},
 					{
 						"cell_type": "code",
@@ -682,10 +541,11 @@
 							"using Newtonsoft.Json;\n",
 							"using System.Data.SqlClient;\n",
 							"using System.Data;\n",
-							""
+							"\n",
+							"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
 						],
 						"outputs": [],
-						"execution_count": 206
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -842,8 +702,11 @@
 							"CloudBlobDirectory blobDirectory;\n",
 							"SqlConnection sqlConn;\n",
 							"\n",
-							"var dbConnectionString = \"\";\n",
-							"var storageConnectionString = \"\";\n",
+							"var accountKey = Credentials.GetSecret(\"VaultSerengeti\",\"ADLS-AccessKey\");\n",
+							"string storageConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";\n",
+							"\n",
+							"var password = Credentials.GetSecret(\"VaultSerengeti\",\"SqlPoolPassword\");\n",
+							"var dbConnectionString = \"Server=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=dedicateddef;Persist Security Info=False;User ID=undefined;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;\";\n",
 							"\n",
 							"var sqlCon = new SqlConnection(dbConnectionString);\n",
 							"\n",
@@ -861,7 +724,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 208
+						"execution_count": 3
 					},
 					{
 						"cell_type": "code",
