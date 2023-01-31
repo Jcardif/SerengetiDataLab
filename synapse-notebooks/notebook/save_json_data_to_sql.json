@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ace31201-74bd-40ca-a2d4-a9b90f1146e7"
+				"spark.autotune.trackingId": "7a4a1ceb-0c00-4c55-98c5-a947e32b4e25"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 189
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -81,7 +81,7 @@
 					"using System.Data;\n",
 					""
 				],
-				"execution_count": 190
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -217,7 +217,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 191
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -253,7 +253,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 192
+				"execution_count": 52
 			},
 			{
 				"cell_type": "code",
@@ -292,7 +292,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 193
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -312,9 +312,9 @@
 					"{\n",
 					"    var commands = new Dictionary<string, string>()\n",
 					"    {\n",
-					"        {\"images\", \"CREATE TABLE images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\"},\n",
-					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(255));\"},\n",
-					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(2) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"}\n",
+					"        {\"images\", \"CREATE TABLE images (id VARCHAR(MAX), file_name VARCHAR(MAX), frame_num INT, seq_id VARCHAR(MAX), width INT, height INT, corrupt BIT, location VARCHAR(MAX), seq_num_frames INT, datetime DATETIME);\"},\n",
+					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(MAX));\"},\n",
+					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(MAX) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(MAX) NOT NULL, season VARCHAR(2) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(MAX) NOT NULL, location VARCHAR(MAX) NOT NULL );\"}\n",
 					"    };\n",
 					"\n",
 					"    await sqlConn.OpenAsync();\n",
@@ -338,7 +338,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 194
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -398,7 +398,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 195
+				"execution_count": 55
 			},
 			{
 				"cell_type": "code",
@@ -416,34 +416,31 @@
 				"source": [
 					"private async Task BulkInsertCategories(List<Category> categories)\n",
 					"{\n",
-					"    var dataTable = new DataTable();\n",
-					"    dataTable.Columns.Add(\"id\", typeof(long));\n",
-					"    dataTable.Columns.Add(\"name\", typeof(string));\n",
-					"\n",
-					"    foreach (var category in categories)\n",
-					"    {\n",
-					"        dataTable.Rows.Add(category.Id, category.Name);\n",
-					"    }\n",
-					"\n",
-					"    var uniqueRows = dataTable.AsEnumerable().Distinct(DataRowComparer.Default);\n",
-					"\n",
 					"    await sqlConn.OpenAsync();\n",
 					"\n",
 					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
 					"    {\n",
 					"        bulkCpy.DestinationTableName = \"categories\";\n",
 					"\n",
-					"        foreach (var row in uniqueRows)\n",
+					"        var dataTable = new DataTable();\n",
+					"        dataTable.Columns.Add(\"id\", typeof(long));\n",
+					"        dataTable.Columns.Add(\"name\", typeof(string));\n",
+					"\n",
+					"        foreach(var category in categories)\n",
 					"        {\n",
-					"            bulkCpy.WriteToServer(row.ItemArray);\n",
+					"            var row = dataTable.NewRow();\n",
+					"            row[\"id\"] = category.Id;\n",
+					"            row[\"name\"] = category.Name;\n",
 					"        }\n",
+					"\n",
+					"        await Task.Run(() => bulkCpy.WriteToServer(dataTable));\n",
 					"    }\n",
 					"\n",
 					"    await sqlConn.CloseAsync();\n",
 					"}\n",
 					""
 				],
-				"execution_count": 196
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -495,7 +492,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 197
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
@@ -535,7 +532,9 @@
 					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
 					"    var serengetiData=await ReadJsonFile(blob);\n",
 					"\n",
-					"    await BulkInsertCategories(serengetiData.Categories);\n",
+					"    if(Array.IndexOf(seasonFiles, file)==0)\n",
+					"        await BulkInsertCategories(serengetiData.Categories);\n",
+					"        \n",
 					"    await BulkInsertImages(serengetiData.Images);\n",
 					"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
 					"\n",
@@ -543,7 +542,7 @@
 					"\n",
 					"}"
 				],
-				"execution_count": 198
+				"execution_count": 58
 			}
 		]
 	}
