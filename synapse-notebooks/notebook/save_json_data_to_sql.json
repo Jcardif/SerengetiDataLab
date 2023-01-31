@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6ffbe67e-d393-4a2c-ad17-ca1f78b72048"
+				"spark.autotune.trackingId": "73d09872-a35f-45bb-8d30-5ec615e212f2"
 			}
 		},
 		"metadata": {
@@ -314,8 +314,10 @@
 					"    {\n",
 					"        {\"images\", \"CREATE TABLE images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\"},\n",
 					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(255));\"},\n",
-					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(255) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"}\n",
+					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(255) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"},\n",
+					"        {\"splits\", \"CREATE TABLE splits ( train VARCHAR(255), test VARCHAR(255) );\"}\n",
 					"    };\n",
+					"\n",
 					"\n",
 					"    await sqlConn.OpenAsync();\n",
 					"\n",
@@ -338,7 +340,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 129
+				"execution_count": 136
 			},
 			{
 				"cell_type": "code",
@@ -508,6 +510,46 @@
 					}
 				},
 				"source": [
+					"private async Task BulkInsertSplits(dynamic splits)\n",
+					"{\n",
+					"    await sqlConn.OpenAsync();\n",
+					"\n",
+					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
+					"    {\n",
+					"        bulkCpy.DestinationTableName = \"splits\";\n",
+					"\n",
+					"        var dataTable = new DataTable();\n",
+					"        dataTable.Columns.Add(\"train\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"test\", typeof(string));\n",
+					"\n",
+					"        foreach (var split in splits)\n",
+					"        {\n",
+					"            var row = dataTable.NewRow();\n",
+					"            row[\"train\"] = split.train;\n",
+					"            row[\"test\"] = split.test;\n",
+					"            dataTable.Rows.Add(row);\n",
+					"        }\n",
+					"\n",
+					"        await bulkCpy.WriteToServerAsync(dataTable);\n",
+					"    }\n",
+					"}"
+				],
+				"execution_count": 135
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
 					"InitStorageAndDb();\n",
 					"await CreateTablesAsync();\n",
 					"\n",
@@ -537,12 +579,33 @@
 					"\n",
 					"    await BulkInsertImages(serengetiData.Images);\n",
 					"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
+					"}\n",
 					"\n",
-					"    Console.WriteLine($\"Completed processing {file}\");\n",
+					"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
+					"var splitData = await ReadJsonFile(blob);\n",
 					"\n",
-					"}"
+					"await BulkInsertSplits(splitData);"
 				],
 				"execution_count": 133
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"\n",
+					""
+				],
+				"execution_count": null
 			}
 		]
 	}
