@@ -3,7 +3,7 @@
 	"type": "Microsoft.Synapse/workspaces/linkedservices",
 	"properties": {
 		"typeProperties": {
-			"url": "https://serenegetidatastore.dfs.core.windows.net"
+			"url": "https://serengeti.dfs.core.windows.net"
 		},
 		"type": "AzureBlobFS",
 		"connectVia": {
