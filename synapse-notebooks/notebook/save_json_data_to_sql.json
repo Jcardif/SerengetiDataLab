@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "73d09872-a35f-45bb-8d30-5ec615e212f2"
+				"spark.autotune.trackingId": "f3c70e3f-8e91-4e73-9e57-74b12dfe74c7"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 124
+				"execution_count": 205
 			},
 			{
 				"cell_type": "code",
@@ -81,7 +81,7 @@
 					"using System.Data;\n",
 					""
 				],
-				"execution_count": 125
+				"execution_count": 206
 			},
 			{
 				"cell_type": "code",
@@ -217,7 +217,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 126
+				"execution_count": 207
 			},
 			{
 				"cell_type": "code",
@@ -237,6 +237,8 @@
 					"CloudBlobDirectory blobDirectory;\n",
 					"SqlConnection sqlConn;\n",
 					"\n",
+					"var dbConnectionString = \"\";\n",
+					"var storageConnectionString = \"\";\n",
 					"\n",
 					"var sqlCon = new SqlConnection(dbConnectionString);\n",
 					"\n",
@@ -253,7 +255,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 127
+				"execution_count": 208
 			},
 			{
 				"cell_type": "code",
@@ -269,7 +271,7 @@
 					}
 				},
 				"source": [
-					"private async Task<SerengetiData> ReadJsonFile (CloudBlockBlob jsonBlob)\n",
+					"private async Task<T> ReadJsonFile<T> (CloudBlockBlob jsonBlob)\n",
 					"{\n",
 					"    using (var memoryStream = new MemoryStream())\n",
 					"    {\n",
@@ -286,13 +288,13 @@
 					"            var jsonSerializer = new JsonSerializer();\n",
 					"\n",
 					"            // Read the JSON file in chunks and deserialize it\n",
-					"            return jsonSerializer.Deserialize<SerengetiData>(jsonTextReader);\n",
+					"            return jsonSerializer.Deserialize<T>(jsonTextReader);\n",
 					"        }\n",
 					"    }\n",
 					"}\n",
 					""
 				],
-				"execution_count": 128
+				"execution_count": 209
 			},
 			{
 				"cell_type": "code",
@@ -315,7 +317,8 @@
 					"        {\"images\", \"CREATE TABLE images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\"},\n",
 					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(255));\"},\n",
 					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(255) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"},\n",
-					"        {\"splits\", \"CREATE TABLE splits ( train VARCHAR(255), test VARCHAR(255) );\"}\n",
+					"        {\"train\", \"CREATE TABLE train ( location VARCHAR(255));\"},\n",
+					"        {\"val\", \"CREATE TABLE val ( location VARCHAR(255));\"}\n",
 					"    };\n",
 					"\n",
 					"\n",
@@ -340,7 +343,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 136
+				"execution_count": 210
 			},
 			{
 				"cell_type": "code",
@@ -400,7 +403,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 130
+				"execution_count": 211
 			},
 			{
 				"cell_type": "code",
@@ -442,7 +445,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 131
+				"execution_count": 212
 			},
 			{
 				"cell_type": "code",
@@ -494,7 +497,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 132
+				"execution_count": 213
 			},
 			{
 				"cell_type": "code",
@@ -516,17 +519,32 @@
 					"\n",
 					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
 					"    {\n",
-					"        bulkCpy.DestinationTableName = \"splits\";\n",
+					"        bulkCpy.DestinationTableName = \"train\";\n",
 					"\n",
 					"        var dataTable = new DataTable();\n",
-					"        dataTable.Columns.Add(\"train\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"test\", typeof(string));\n",
+					"        dataTable.Columns.Add(\"location\", typeof(string));\n",
 					"\n",
-					"        foreach (var split in splits)\n",
+					"        foreach (var loc in splitData.splits.train)\n",
 					"        {\n",
 					"            var row = dataTable.NewRow();\n",
-					"            row[\"train\"] = split.train;\n",
-					"            row[\"test\"] = split.test;\n",
+					"            row[\"location\"] = loc;\n",
+					"            dataTable.Rows.Add(row);\n",
+					"        }\n",
+					"\n",
+					"        await bulkCpy.WriteToServerAsync(dataTable);\n",
+					"    }\n",
+					"\n",
+					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
+					"    {\n",
+					"        bulkCpy.DestinationTableName = \"val\";\n",
+					"\n",
+					"        var dataTable = new DataTable();\n",
+					"        dataTable.Columns.Add(\"location\", typeof(string));\n",
+					"\n",
+					"        foreach (var loc in splitData.splits.val)\n",
+					"        {\n",
+					"            var row = dataTable.NewRow();\n",
+					"            row[\"location\"] = loc;\n",
 					"            dataTable.Rows.Add(row);\n",
 					"        }\n",
 					"\n",
@@ -534,7 +552,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 135
+				"execution_count": 214
 			},
 			{
 				"cell_type": "code",
@@ -572,7 +590,7 @@
 					"foreach (var file in seasonFiles)\n",
 					"{\n",
 					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
-					"    var serengetiData=await ReadJsonFile(blob);\n",
+					"    var serengetiData=await ReadJsonFile<SerengetiData>(blob);\n",
 					"\n",
 					"    if(seasonFiles.IndexOf(file) == 0)\n",
 					"        await BulkInsertCategories(serengetiData.Categories);\n",
@@ -582,30 +600,11 @@
 					"}\n",
 					"\n",
 					"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
-					"var splitData = await ReadJsonFile(blob);\n",
+					"var splitData = await ReadJsonFile<dynamic>(blob);\n",
 					"\n",
 					"await BulkInsertSplits(splitData);"
 				],
-				"execution_count": 133
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"\n",
-					""
-				],
-				"execution_count": null
+				"execution_count": 215
 			}
 		]
 	}
