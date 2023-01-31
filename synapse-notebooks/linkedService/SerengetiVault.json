@@ -1,5 +1,6 @@
 {
 	"name": "SerengetiVault",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
 	"properties": {
 		"annotations": [],
 		"type": "AzureKeyVault",
