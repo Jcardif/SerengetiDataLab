@@ -1,0 +1,10 @@
+{
+	"name": "SerengetiVault",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://VaultSerengeti.vault.azure.net/"
+		}
+	}
+}
