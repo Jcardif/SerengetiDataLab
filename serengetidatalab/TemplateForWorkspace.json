@@ -12,15 +12,50 @@
 			"metadata": "Secure string for 'connectionString' of 'serengetidatalab-WorkspaceDefaultSqlServer'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"SerengetiVault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://VaultSerengeti.vault.azure.net/"
+		},
 		"serengetidatalab-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://serenegetidatastore.dfs.core.windows.net"
+			"defaultValue": "https://serengeti.dfs.core.windows.net"
 		}
 	},
 	"variables": {
 		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/DefaultPool')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/dedicateddef')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SerengetiVault')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('SerengetiVault_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/serengetidatalab-WorkspaceDefaultSqlServer')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
@@ -94,6 +129,147 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "DefaultPool",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "9ba1a922-4f3b-4f46-92da-ef0d38c6a524"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_sparkdotnet",
+						"display_name": "csharp"
+					},
+					"language_info": {
+						"name": "csharp"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/SerengetiDataLab/providers/Microsoft.Synapse/workspaces/serengetidatalab/bigDataPools/DefaultPool",
+						"name": "DefaultPool",
+						"type": "Spark",
+						"endpoint": "https://serengetidatalab.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/DefaultPool",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.3",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"#r \"nuget: Microsoft.Azure.Services.AppAuthentication\"\n",
+							"#r \"nuget: Microsoft.Azure.KeyVault\""
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"using Microsoft.Azure.Services.AppAuthentication;\n",
+							"using Microsoft.Azure.KeyVault;"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Utils;\n",
+							"\n",
+							"string connectionString = TokenLibrary.GetConnectionString(\"SerengetiVault\");\n",
+							"Console.WriteLine(connectionString);"
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"var keyVaultUrl= \"https://vaultserengeti.vault.azure.net/\";\n",
+							"var secretName = \"SqlPoolConnectionStrring\";\n",
+							"\n",
+							"// Authenticate the request using a service principal or a managed identity\n",
+							"var azureServiceTokenProvider = new AzureServiceTokenProvider();\n",
+							"var accessToken = await azureServiceTokenProvider.GetAccessTokenAsync(\"https://vault.azure.net\");\n",
+							"\n",
+							"// Create the Key Vault client\n",
+							"var keyVaultClient = new KeyVaultClient(\n",
+							"    (authority, resource, scope) =>\n",
+							"        azureServiceTokenProvider.KeyVaultTokenCallback(authority, resource, scope));\n",
+							"\n",
+							"// Get the secret value\n",
+							"var secret = await keyVaultClient.GetSecretAsync(keyVaultUrl, secretName);\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 15
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/copy_zipped_metadata_files')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -115,15 +291,15 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "70dc3a65-5543-4107-92c3-5c5caec21011"
+						"spark.autotune.trackingId": "799c4b3d-b5c5-447f-a24e-06f3d14a68ed"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
+						"name": "synapse_sparkdotnet",
+						"display_name": "csharp"
 					},
 					"language_info": {
 						"name": "csharp"
@@ -140,7 +316,8 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56
+						"memory": 56,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -443,15 +620,15 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "380e83a7-b50d-46b9-9854-50fb72d1eeae"
+						"spark.autotune.trackingId": "f3c70e3f-8e91-4e73-9e57-74b12dfe74c7"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_sparkdotnet",
-						"display_name": "csharp"
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
 					},
 					"language_info": {
 						"name": "csharp"
@@ -468,15 +645,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#r \"nuget: Microsoft.Azure.Storage.Common\"\n",
 							"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
@@ -485,7 +660,7 @@
 							"#r \"nuget: System.Data.SqlClient\""
 						],
 						"outputs": [],
-						"execution_count": 189
+						"execution_count": 205
 					},
 					{
 						"cell_type": "code",
@@ -510,7 +685,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 190
+						"execution_count": 206
 					},
 					{
 						"cell_type": "code",
@@ -647,7 +822,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 191
+						"execution_count": 207
 					},
 					{
 						"cell_type": "code",
@@ -667,6 +842,8 @@
 							"CloudBlobDirectory blobDirectory;\n",
 							"SqlConnection sqlConn;\n",
 							"\n",
+							"var dbConnectionString = \"\";\n",
+							"var storageConnectionString = \"\";\n",
 							"\n",
 							"var sqlCon = new SqlConnection(dbConnectionString);\n",
 							"\n",
@@ -684,7 +861,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 192
+						"execution_count": 208
 					},
 					{
 						"cell_type": "code",
@@ -700,7 +877,7 @@
 							}
 						},
 						"source": [
-							"private async Task<SerengetiData> ReadJsonFile (CloudBlockBlob jsonBlob)\n",
+							"private async Task<T> ReadJsonFile<T> (CloudBlockBlob jsonBlob)\n",
 							"{\n",
 							"    using (var memoryStream = new MemoryStream())\n",
 							"    {\n",
@@ -717,14 +894,14 @@
 							"            var jsonSerializer = new JsonSerializer();\n",
 							"\n",
 							"            // Read the JSON file in chunks and deserialize it\n",
-							"            return jsonSerializer.Deserialize<SerengetiData>(jsonTextReader);\n",
+							"            return jsonSerializer.Deserialize<T>(jsonTextReader);\n",
 							"        }\n",
 							"    }\n",
 							"}\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 193
+						"execution_count": 209
 					},
 					{
 						"cell_type": "code",
@@ -746,8 +923,11 @@
 							"    {\n",
 							"        {\"images\", \"CREATE TABLE images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\"},\n",
 							"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(255));\"},\n",
-							"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(2) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"}\n",
+							"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(255) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"},\n",
+							"        {\"train\", \"CREATE TABLE train ( location VARCHAR(255));\"},\n",
+							"        {\"val\", \"CREATE TABLE val ( location VARCHAR(255));\"}\n",
 							"    };\n",
+							"\n",
 							"\n",
 							"    await sqlConn.OpenAsync();\n",
 							"\n",
@@ -771,7 +951,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 194
+						"execution_count": 210
 					},
 					{
 						"cell_type": "code",
@@ -832,7 +1012,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 195
+						"execution_count": 211
 					},
 					{
 						"cell_type": "code",
@@ -850,27 +1030,24 @@
 						"source": [
 							"private async Task BulkInsertCategories(List<Category> categories)\n",
 							"{\n",
-							"    var dataTable = new DataTable();\n",
-							"    dataTable.Columns.Add(\"id\", typeof(long));\n",
-							"    dataTable.Columns.Add(\"name\", typeof(string));\n",
-							"\n",
-							"    foreach (var category in categories)\n",
-							"    {\n",
-							"        dataTable.Rows.Add(category.Id, category.Name);\n",
-							"    }\n",
-							"\n",
-							"    var uniqueRows = dataTable.AsEnumerable().Distinct(DataRowComparer.Default);\n",
-							"\n",
 							"    await sqlConn.OpenAsync();\n",
 							"\n",
 							"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
 							"    {\n",
 							"        bulkCpy.DestinationTableName = \"categories\";\n",
 							"\n",
-							"        foreach (var row in uniqueRows)\n",
+							"        var dataTable = new DataTable();\n",
+							"        dataTable.Columns.Add(\"id\", typeof(long));\n",
+							"        dataTable.Columns.Add(\"name\", typeof(string));\n",
+							"\n",
+							"        foreach(var category in categories)\n",
 							"        {\n",
-							"            bulkCpy.WriteToServer(row.ItemArray);\n",
+							"            var row = dataTable.NewRow();\n",
+							"            row[\"id\"] = category.Id;\n",
+							"            row[\"name\"] = category.Name;\n",
 							"        }\n",
+							"\n",
+							"        await Task.Run(() => bulkCpy.WriteToServer(dataTable));\n",
 							"    }\n",
 							"\n",
 							"    await sqlConn.CloseAsync();\n",
@@ -878,7 +1055,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 196
+						"execution_count": 212
 					},
 					{
 						"cell_type": "code",
@@ -931,7 +1108,63 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 197
+						"execution_count": 213
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"private async Task BulkInsertSplits(dynamic splits)\n",
+							"{\n",
+							"    await sqlConn.OpenAsync();\n",
+							"\n",
+							"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
+							"    {\n",
+							"        bulkCpy.DestinationTableName = \"train\";\n",
+							"\n",
+							"        var dataTable = new DataTable();\n",
+							"        dataTable.Columns.Add(\"location\", typeof(string));\n",
+							"\n",
+							"        foreach (var loc in splitData.splits.train)\n",
+							"        {\n",
+							"            var row = dataTable.NewRow();\n",
+							"            row[\"location\"] = loc;\n",
+							"            dataTable.Rows.Add(row);\n",
+							"        }\n",
+							"\n",
+							"        await bulkCpy.WriteToServerAsync(dataTable);\n",
+							"    }\n",
+							"\n",
+							"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
+							"    {\n",
+							"        bulkCpy.DestinationTableName = \"val\";\n",
+							"\n",
+							"        var dataTable = new DataTable();\n",
+							"        dataTable.Columns.Add(\"location\", typeof(string));\n",
+							"\n",
+							"        foreach (var loc in splitData.splits.val)\n",
+							"        {\n",
+							"            var row = dataTable.NewRow();\n",
+							"            row[\"location\"] = loc;\n",
+							"            dataTable.Rows.Add(row);\n",
+							"        }\n",
+							"\n",
+							"        await bulkCpy.WriteToServerAsync(dataTable);\n",
+							"    }\n",
+							"}"
+						],
+						"outputs": [],
+						"execution_count": 214
 					},
 					{
 						"cell_type": "code",
@@ -951,7 +1184,7 @@
 							"await CreateTablesAsync();\n",
 							"\n",
 							"//season files\n",
-							"var seasonFiles = new string[]\n",
+							"var seasonFiles = new List<string>()\n",
 							"{\n",
 							"    \"SnapshotSerengetiS01.json\",\n",
 							"    \"SnapshotSerengetiS02.json\",\n",
@@ -963,24 +1196,28 @@
 							"    \"SnapshotSerengetiS08.json\",\n",
 							"    \"SnapshotSerengetiS09.json\",\n",
 							"    \"SnapshotSerengetiS10.json\",\n",
-							"    \"SnapshotSerengetiS11.json\",\n",
+							"    \"SnapshotSerengetiS11.json\"\n",
 							"};\n",
 							"\n",
 							"foreach (var file in seasonFiles)\n",
 							"{\n",
 							"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
-							"    var serengetiData=await ReadJsonFile(blob);\n",
+							"    var serengetiData=await ReadJsonFile<SerengetiData>(blob);\n",
 							"\n",
-							"    await BulkInsertCategories(serengetiData.Categories);\n",
+							"    if(seasonFiles.IndexOf(file) == 0)\n",
+							"        await BulkInsertCategories(serengetiData.Categories);\n",
+							"\n",
 							"    await BulkInsertImages(serengetiData.Images);\n",
 							"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
+							"}\n",
 							"\n",
-							"    Console.WriteLine($\"Completed processing {file}\");\n",
+							"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
+							"var splitData = await ReadJsonFile<dynamic>(blob);\n",
 							"\n",
-							"}"
+							"await BulkInsertSplits(splitData);"
 						],
 						"outputs": [],
-						"execution_count": 198
+						"execution_count": 215
 					}
 				]
 			},
@@ -1009,10 +1246,10 @@
 				"annotations": []
 			},
 			"dependsOn": [],
-			"location": "eastus2"
+			"location": "eastus"
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/defdedicated')]",
+			"name": "[concat(parameters('workspaceName'), '/dedicateddef')]",
 			"type": "Microsoft.Synapse/workspaces/sqlPools",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -1021,7 +1258,7 @@
 				"annotations": []
 			},
 			"dependsOn": [],
-			"location": "eastus2"
+			"location": "eastus"
 		}
 	]
 }
