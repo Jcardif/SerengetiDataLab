@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "dbf3f7a3-7056-43d5-8fd5-9fdf7a1f2f73"
+				"spark.autotune.trackingId": "95e83c7f-3676-4924-a5ec-53650e3cb1a2"
 			}
 		},
 		"metadata": {
@@ -66,11 +66,9 @@
 				"source": [
 					"#r \"nuget: Microsoft.Azure.Storage.Common\"\n",
 					"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
-					"#r \"nuget: Microsoft.Azure.Storage.File\"\n",
-					"#r \"nuget: Microsoft.Azure.Storage.DataMovement\"\n",
-					"#r \"nuget: Azure.Identity\""
+					"#r \"nuget: Microsoft.Azure.Storage.File\""
 				],
-				"execution_count": 108
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -88,18 +86,16 @@
 				"source": [
 					"using Microsoft.Azure.Storage;\n",
 					"using Microsoft.Azure.Storage.Blob;\n",
-					"using Microsoft.Azure.Storage.DataMovement;\n",
 					"using Microsoft.Azure.Storage.File;\n",
 					"using System.IO;\n",
 					"using System.IO.Compression;\n",
-					"using Azure.Identity;\n",
 					"\n",
 					"using CopyStatus = Microsoft.Azure.Storage.Blob.CopyStatus;\n",
 					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Utils;\n",
 					"using Microsoft.Azure.Storage.Auth;\n",
-					""
+					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
 				],
-				"execution_count": 109
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -118,9 +114,10 @@
 					"CloudBlobContainer destContainer, sourceContainer;\n",
 					"CloudBlobDirectory destDirectory;\n",
 					"\n",
-					"string destConnectionString = \"\";"
+					"var accountKey = Credentials.GetSecret(\"VaultSerengeti\",\"ADLS-AccessKey\");\n",
+					"string destConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";"
 				],
-				"execution_count": 110
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -158,7 +155,7 @@
 					"    destDirectory = destContainer.GetDirectoryReference(\"metadata\");\n",
 					"}"
 				],
-				"execution_count": 111
+				"execution_count": 118
 			},
 			{
 				"cell_type": "code",
@@ -199,7 +196,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 112
+				"execution_count": 119
 			},
 			{
 				"cell_type": "code",
@@ -242,7 +239,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 113
+				"execution_count": 120
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +294,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 114
+				"execution_count": 121
 			},
 			{
 				"cell_type": "code",
