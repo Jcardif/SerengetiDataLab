@@ -111,6 +111,66 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT * FROM  val",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "dedicateddef",
+						"poolName": "dedicateddef"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT * FROM annotations",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "dedicateddef",
+						"poolName": "dedicateddef"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/drop_tables')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "DROP TABLE val\nDROP TABLE train\nDROP TABLE images\nDROP TABLE categories\nDROP TABLE annotations\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "dedicateddef",
+						"poolName": "dedicateddef"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/copy_zipped_metadata_files')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -132,15 +192,15 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "97bfb46f-705e-4550-90d2-4afd459477ee"
+						"spark.autotune.trackingId": "71d93f75-9f45-471d-9699-1a3e269f0428"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_sparkdotnet",
-						"display_name": "csharp"
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
 					},
 					"language_info": {
 						"name": "csharp"
@@ -157,8 +217,7 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -451,16 +510,16 @@
 					"type": "BigDataPoolReference"
 				},
 				"sessionProperties": {
-					"driverMemory": "56g",
-					"driverCores": 8,
-					"executorMemory": "56g",
-					"executorCores": 8,
+					"driverMemory": "112g",
+					"driverCores": 16,
+					"executorMemory": "112g",
+					"executorCores": 16,
 					"numExecutors": 9,
 					"conf": {
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "9",
 						"spark.dynamicAllocation.maxExecutors": "9",
-						"spark.autotune.trackingId": "56297a7d-d18c-468a-8ad1-eec8532af739"
+						"spark.autotune.trackingId": "97ff07cc-41de-46a8-b014-72fa3a36ea48"
 					}
 				},
 				"metadata": {
@@ -484,8 +543,8 @@
 						},
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
-						"cores": 8,
-						"memory": 56,
+						"cores": 16,
+						"memory": 112,
 						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 120
@@ -502,7 +561,7 @@
 							"#r \"nuget: System.Data.SqlClient\""
 						],
 						"outputs": [],
-						"execution_count": 43
+						"execution_count": 1
 					},
 					{
 						"cell_type": "code",
@@ -530,7 +589,7 @@
 							"using System.Collections.Concurrent;"
 						],
 						"outputs": [],
-						"execution_count": 44
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -675,7 +734,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 45
+						"execution_count": 3
 					},
 					{
 						"cell_type": "code",
@@ -717,7 +776,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 46
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
@@ -757,7 +816,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 47
+						"execution_count": 5
 					},
 					{
 						"cell_type": "code",
@@ -807,7 +866,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 48
+						"execution_count": 6
 					},
 					{
 						"cell_type": "code",
@@ -868,7 +927,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 49
+						"execution_count": 7
 					},
 					{
 						"cell_type": "code",
@@ -911,7 +970,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 50
+						"execution_count": 8
 					},
 					{
 						"cell_type": "code",
@@ -964,7 +1023,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 51
+						"execution_count": 9
 					},
 					{
 						"cell_type": "code",
@@ -1020,7 +1079,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 52
+						"execution_count": 10
 					},
 					{
 						"cell_type": "code",
@@ -1056,7 +1115,7 @@
 							"};"
 						],
 						"outputs": [],
-						"execution_count": 53
+						"execution_count": 11
 					},
 					{
 						"cell_type": "code",
@@ -1072,112 +1131,41 @@
 							}
 						},
 						"source": [
-							"var dataset = new SerengetiData();\n",
-							"var resetEvent = new ManualResetEvent(false);\n",
-							"int filesLeft = seasonFiles.Count;\n",
-							"\n",
-							"\n",
-							"Parallel.ForEach(seasonFiles, async file =>\n",
+							"foreach (var file in seasonFiles)\n",
 							"{\n",
 							"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
-							"    var data = await ReadJsonFileAsync<SerengetiData>(blob);\n",
+							"    var serengetiData=await ReadJsonFileAsync<SerengetiData>(blob);\n",
 							"\n",
-							"    lock (dataset)\n",
-							"    {\n",
-							"        if(seasonFiles.IndexOf(file)==1)\n",
-							"            dataset.Categories.AddRange(data.Categories);\n",
-							"            \n",
-							"        dataset.Annotations.AddRange(data.Annotations);\n",
-							"        dataset.Images.AddRange(data.Images);\n",
-							"    }\n",
+							"    if(seasonFiles.IndexOf(file) == 1)\n",
+							"        await BulkInsertCategories(serengetiData.Categories);\n",
 							"\n",
-							"    if (Interlocked.Decrement(ref filesLeft) == 0)\n",
-							"    {\n",
-							"        resetEvent.Set();\n",
-							"    }\n",
-							"});\n",
+							"    await BulkInsertImages(serengetiData.Images);\n",
+							"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
+							"}\n",
 							"\n",
-							"resetEvent.WaitOne();"
-						],
-						"outputs": [],
-						"execution_count": 54
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"await BulkInsertImages(dataset.Images);"
-						],
-						"outputs": [],
-						"execution_count": null
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"await BulkInsertAnnotations(dataset.Annotations);"
-						],
-						"outputs": [],
-						"execution_count": null
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"await BulkInsertCategories(dataset.Categories);\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": null
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
 							"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
 							"var splitData = await ReadJsonFileAsync<dynamic>(blob);\n",
 							"\n",
 							"await BulkInsertSplits(splitData);"
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
 						],
 						"outputs": [],
 						"execution_count": null
@@ -1222,66 +1210,6 @@
 			},
 			"dependsOn": [],
 			"location": "eastus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/drop_tables')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "DROP TABLE val\nDROP TABLE train\nDROP TABLE images\nDROP TABLE categories\nDROP TABLE annotations\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "dedicateddef",
-						"poolName": "dedicateddef"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT * FROM val",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "dedicateddef",
-						"poolName": "dedicateddef"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT * FROM annotations",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "dedicateddef",
-						"poolName": "dedicateddef"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
 		}
 	]
 }
