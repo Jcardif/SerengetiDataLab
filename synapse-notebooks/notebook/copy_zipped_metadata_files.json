@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8937f13e-28c0-4e83-a4a1-01baa06b1d64"
+				"spark.autotune.trackingId": "71d93f75-9f45-471d-9699-1a3e269f0428"
 			}
 		},
 		"metadata": {
@@ -94,7 +94,7 @@
 					"using Microsoft.Azure.Storage.Auth;\n",
 					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
 				],
-				"execution_count": 6
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -116,7 +116,7 @@
 					"var accountKey = Credentials.GetSecret(\"VaultSerengeti\",\"ADLS-AccessKey\");\n",
 					"string destConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";"
 				],
-				"execution_count": 7
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -154,7 +154,7 @@
 					"    destDirectory = destContainer.GetDirectoryReference(\"metadata\");\n",
 					"}"
 				],
-				"execution_count": 118
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -195,7 +195,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 119
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -238,7 +238,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 120
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -293,7 +293,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 121
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
