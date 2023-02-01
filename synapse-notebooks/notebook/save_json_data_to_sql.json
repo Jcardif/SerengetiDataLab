@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fea98d0a-151d-4d8a-8906-8c8ce30d14db"
+				"spark.autotune.trackingId": "3de373d4-3fbd-424a-a859-1bc7886cf2c4"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 50
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -82,7 +82,7 @@
 					"\n",
 					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
 				],
-				"execution_count": 51
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -111,6 +111,14 @@
 					"\n",
 					"    [JsonProperty(\"annotations\")]\n",
 					"    public List<Annotation> Annotations { get; set; }\n",
+					"\n",
+					"    public SerengetiData()\n",
+					"    {\n",
+					"        Info = new Info();\n",
+					"        Categories = new List<Category>();\n",
+					"        Images = new List<Image>();\n",
+					"        Annotations = new List<Annotation>();\n",
+					"    }\n",
 					"}\n",
 					"\n",
 					"public class Annotation\n",
@@ -218,7 +226,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 52
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -259,7 +267,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 53
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -298,7 +306,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 54
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -347,7 +355,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 55
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -407,7 +415,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 56
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -449,7 +457,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 57
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -501,7 +509,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 58
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -556,7 +564,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 59
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -603,7 +611,7 @@
 					"    dataset.Images.AddRange(data.Images);\n",
 					"}"
 				],
-				"execution_count": 60
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -619,22 +627,7 @@
 					}
 				},
 				"source": [
-					"foreach (var file in seasonFiles)\n",
-					"{\n",
-					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
-					"    var serengetiData=await ReadJsonFile<SerengetiData>(blob);\n",
-					"\n",
-					"    if(seasonFiles.IndexOf(file) == 0)\n",
-					"        await BulkInsertCategories(serengetiData.Categories);\n",
-					"\n",
-					"    await BulkInsertImages(serengetiData.Images);\n",
-					"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
-					"}\n",
-					"\n",
-					"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
-					"var splitData = await ReadJsonFile<dynamic>(blob);\n",
-					"\n",
-					"await BulkInsertSplits(splitData);"
+					""
 				],
 				"execution_count": null
 			}
