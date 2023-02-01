@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3de373d4-3fbd-424a-a859-1bc7886cf2c4"
+				"spark.autotune.trackingId": "3167d046-0177-47bc-a448-1803d300ef88"
 			}
 		},
 		"metadata": {
@@ -82,7 +82,7 @@
 					"\n",
 					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -226,7 +226,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -267,7 +267,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -283,7 +283,7 @@
 					}
 				},
 				"source": [
-					"private async Task<T> ReadJsonFile<T> (CloudBlockBlob jsonBlob)\n",
+					"private async Task<T> ReadJsonFileAsync<T> (CloudBlockBlob jsonBlob)\n",
 					"{\n",
 					"    using (var memoryStream = new MemoryStream())\n",
 					"    {\n",
@@ -306,7 +306,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -355,7 +355,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -415,7 +415,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -457,7 +457,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -509,7 +509,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -564,7 +564,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -597,21 +597,9 @@
 					"    \"SnapshotSerengetiS09.json\",\n",
 					"    \"SnapshotSerengetiS10.json\",\n",
 					"    \"SnapshotSerengetiS11.json\"\n",
-					"};\n",
-					"\n",
-					"var dataset = new SerengetiData();\n",
-					"\n",
-					"foreach(var file in seasonFiles)\n",
-					"{\n",
-					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
-					"    var data = await ReadJsonFile<SerengetiData>(blob);\n",
-					"\n",
-					"    dataset.Categories.AddRange(data.Categories);\n",
-					"    dataset.Annotations.AddRange(data.Annotations);\n",
-					"    dataset.Images.AddRange(data.Images);\n",
-					"}"
+					"};"
 				],
-				"execution_count": null
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -627,9 +615,70 @@
 					}
 				},
 				"source": [
+					"var dataset = new SerengetiData();\n",
+					"var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };\n",
+					"\n",
+					"Parallel.ForEach(seasonFiles, options, async file =>\n",
+					"{\n",
+					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
+					"    var data = await ReadJsonFileAsync<SerengetiData>(blob);\n",
+					"\n",
+					"    lock (dataset)\n",
+					"    {\n",
+					"        dataset.Categories.AddRange(data.Categories);\n",
+					"        dataset.Annotations.AddRange(data.Annotations);\n",
+					"        dataset.Images.AddRange(data.Images);\n",
+					"    }\n",
+					"});\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 26
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Console.WriteLine(dataset.Annotations.Count);"
+				],
+				"execution_count": 28
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"var dataset = new SerengetiData();\n",
+					"\n",
+					"foreach(var file in seasonFiles)\n",
+					"{\n",
+					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
+					"    var data = await ReadJsonFile<SerengetiData>(blob);\n",
+					"\n",
+					"    dataset.Categories.AddRange(data.Categories);\n",
+					"    dataset.Annotations.AddRange(data.Annotations);\n",
+					"    dataset.Images.AddRange(data.Images);\n",
+					"}"
+				],
+				"execution_count": 12
 			}
 		]
 	}
