@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e568c1a2-0b98-483f-a83a-3e0c813aa0df"
+				"spark.autotune.trackingId": "fea98d0a-151d-4d8a-8906-8c8ce30d14db"
 			}
 		},
 		"metadata": {
@@ -604,6 +604,39 @@
 					"}"
 				],
 				"execution_count": 60
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"foreach (var file in seasonFiles)\n",
+					"{\n",
+					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
+					"    var serengetiData=await ReadJsonFile<SerengetiData>(blob);\n",
+					"\n",
+					"    if(seasonFiles.IndexOf(file) == 0)\n",
+					"        await BulkInsertCategories(serengetiData.Categories);\n",
+					"\n",
+					"    await BulkInsertImages(serengetiData.Images);\n",
+					"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
+					"}\n",
+					"\n",
+					"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
+					"var splitData = await ReadJsonFile<dynamic>(blob);\n",
+					"\n",
+					"await BulkInsertSplits(splitData);"
+				],
+				"execution_count": null
 			}
 		]
 	}
