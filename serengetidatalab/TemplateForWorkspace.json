@@ -26,24 +26,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('workspaceName'), '/DefaultPool')]",
-			"type": "Microsoft.Synapse/workspaces/bigDataPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/dedicateddef')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/SerengetiVault')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -150,7 +132,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "bdd652c2-06a3-4088-b985-e355e4a8c1f8"
+						"spark.autotune.trackingId": "97bfb46f-705e-4550-90d2-4afd459477ee"
 					}
 				},
 				"metadata": {
@@ -228,7 +210,7 @@
 							"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -251,7 +233,7 @@
 							"string destConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";"
 						],
 						"outputs": [],
-						"execution_count": 7
+						"execution_count": 3
 					},
 					{
 						"cell_type": "code",
@@ -290,7 +272,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 118
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
@@ -332,7 +314,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 119
+						"execution_count": 5
 					},
 					{
 						"cell_type": "code",
@@ -376,7 +358,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 120
+						"execution_count": 6
 					},
 					{
 						"cell_type": "code",
@@ -432,7 +414,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 121
+						"execution_count": 7
 					},
 					{
 						"cell_type": "code",
@@ -473,12 +455,12 @@
 					"driverCores": 8,
 					"executorMemory": "56g",
 					"executorCores": 8,
-					"numExecutors": 2,
+					"numExecutors": 9,
 					"conf": {
 						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "757f8824-b9d9-49af-92fe-304a2b457d51"
+						"spark.dynamicAllocation.minExecutors": "9",
+						"spark.dynamicAllocation.maxExecutors": "9",
+						"spark.autotune.trackingId": "56297a7d-d18c-468a-8ad1-eec8532af739"
 					}
 				},
 				"metadata": {
@@ -503,13 +485,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56
+						"memory": 56,
+						"automaticScaleJobs": false
 					},
-					"sessionKeepAliveTimeout": 30
+					"sessionKeepAliveTimeout": 120
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#r \"nuget: Microsoft.Azure.Storage.Common\"\n",
 							"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
@@ -518,7 +502,7 @@
 							"#r \"nuget: System.Data.SqlClient\""
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 43
 					},
 					{
 						"cell_type": "code",
@@ -540,11 +524,13 @@
 							"using Newtonsoft.Json;\n",
 							"using System.Data.SqlClient;\n",
 							"using System.Data;\n",
+							"using System.Threading;\n",
+							"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;\n",
 							"\n",
-							"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
+							"using System.Collections.Concurrent;"
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 44
 					},
 					{
 						"cell_type": "code",
@@ -573,6 +559,14 @@
 							"\n",
 							"    [JsonProperty(\"annotations\")]\n",
 							"    public List<Annotation> Annotations { get; set; }\n",
+							"\n",
+							"    public SerengetiData()\n",
+							"    {\n",
+							"        Info = new Info();\n",
+							"        Categories = new List<Category>();\n",
+							"        Images = new List<Image>();\n",
+							"        Annotations = new List<Annotation>();\n",
+							"    }\n",
 							"}\n",
 							"\n",
 							"public class Annotation\n",
@@ -681,7 +675,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 207
+						"execution_count": 45
 					},
 					{
 						"cell_type": "code",
@@ -705,7 +699,7 @@
 							"string storageConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";\n",
 							"\n",
 							"var password = Credentials.GetSecret(\"VaultSerengeti\",\"SqlPoolPassword\");\n",
-							"var dbConnectionString = \"Server=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=dedicateddef;Persist Security Info=False;User ID=undefined;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;\";\n",
+							"var dbConnectionString = $\"Server=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=dedicateddef;Persist Security Info=False;User ID=sqladminuser;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;\";\n",
 							"\n",
 							"var sqlCon = new SqlConnection(dbConnectionString);\n",
 							"\n",
@@ -723,7 +717,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": 46
 					},
 					{
 						"cell_type": "code",
@@ -739,7 +733,7 @@
 							}
 						},
 						"source": [
-							"private async Task<T> ReadJsonFile<T> (CloudBlockBlob jsonBlob)\n",
+							"private async Task<T> ReadJsonFileAsync<T> (CloudBlockBlob jsonBlob)\n",
 							"{\n",
 							"    using (var memoryStream = new MemoryStream())\n",
 							"    {\n",
@@ -763,7 +757,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 209
+						"execution_count": 47
 					},
 					{
 						"cell_type": "code",
@@ -813,7 +807,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 210
+						"execution_count": 48
 					},
 					{
 						"cell_type": "code",
@@ -874,7 +868,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 211
+						"execution_count": 49
 					},
 					{
 						"cell_type": "code",
@@ -917,7 +911,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 212
+						"execution_count": 50
 					},
 					{
 						"cell_type": "code",
@@ -970,7 +964,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 213
+						"execution_count": 51
 					},
 					{
 						"cell_type": "code",
@@ -986,7 +980,7 @@
 							}
 						},
 						"source": [
-							"private async Task BulkInsertSplits(dynamic splits)\n",
+							"private async Task BulkInsertSplits(dynamic splitData)\n",
 							"{\n",
 							"    await sqlConn.OpenAsync();\n",
 							"\n",
@@ -1026,7 +1020,7 @@
 							"}"
 						],
 						"outputs": [],
-						"execution_count": 214
+						"execution_count": 52
 					},
 					{
 						"cell_type": "code",
@@ -1059,27 +1053,134 @@
 							"    \"SnapshotSerengetiS09.json\",\n",
 							"    \"SnapshotSerengetiS10.json\",\n",
 							"    \"SnapshotSerengetiS11.json\"\n",
-							"};\n",
+							"};"
+						],
+						"outputs": [],
+						"execution_count": 53
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"var dataset = new SerengetiData();\n",
+							"var resetEvent = new ManualResetEvent(false);\n",
+							"int filesLeft = seasonFiles.Count;\n",
 							"\n",
-							"foreach (var file in seasonFiles)\n",
+							"\n",
+							"Parallel.ForEach(seasonFiles, async file =>\n",
 							"{\n",
 							"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
-							"    var serengetiData=await ReadJsonFile<SerengetiData>(blob);\n",
+							"    var data = await ReadJsonFileAsync<SerengetiData>(blob);\n",
 							"\n",
-							"    if(seasonFiles.IndexOf(file) == 0)\n",
-							"        await BulkInsertCategories(serengetiData.Categories);\n",
+							"    lock (dataset)\n",
+							"    {\n",
+							"        if(seasonFiles.IndexOf(file)==1)\n",
+							"            dataset.Categories.AddRange(data.Categories);\n",
+							"            \n",
+							"        dataset.Annotations.AddRange(data.Annotations);\n",
+							"        dataset.Images.AddRange(data.Images);\n",
+							"    }\n",
 							"\n",
-							"    await BulkInsertImages(serengetiData.Images);\n",
-							"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
-							"}\n",
+							"    if (Interlocked.Decrement(ref filesLeft) == 0)\n",
+							"    {\n",
+							"        resetEvent.Set();\n",
+							"    }\n",
+							"});\n",
 							"\n",
+							"resetEvent.WaitOne();"
+						],
+						"outputs": [],
+						"execution_count": 54
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"await BulkInsertImages(dataset.Images);"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"await BulkInsertAnnotations(dataset.Annotations);"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"await BulkInsertCategories(dataset.Categories);\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
 							"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
-							"var splitData = await ReadJsonFile<dynamic>(blob);\n",
+							"var splitData = await ReadJsonFileAsync<dynamic>(blob);\n",
 							"\n",
 							"await BulkInsertSplits(splitData);"
 						],
 						"outputs": [],
-						"execution_count": 215
+						"execution_count": null
 					}
 				]
 			},
@@ -1121,6 +1222,66 @@
 			},
 			"dependsOn": [],
 			"location": "eastus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/drop_tables')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "DROP TABLE val\nDROP TABLE train\nDROP TABLE images\nDROP TABLE categories\nDROP TABLE annotations\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "dedicateddef",
+						"poolName": "dedicateddef"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT * FROM val",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "dedicateddef",
+						"poolName": "dedicateddef"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT * FROM annotations",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "dedicateddef",
+						"poolName": "dedicateddef"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
 		}
 	]
 }
