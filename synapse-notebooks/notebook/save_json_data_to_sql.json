@@ -12,12 +12,12 @@
 			"driverCores": 8,
 			"executorMemory": "56g",
 			"executorCores": 8,
-			"numExecutors": 2,
+			"numExecutors": 9,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
-				"spark.dynamicAllocation.minExecutors": "2",
-				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3167d046-0177-47bc-a448-1803d300ef88"
+				"spark.dynamicAllocation.minExecutors": "9",
+				"spark.dynamicAllocation.maxExecutors": "9",
+				"spark.autotune.trackingId": "af89f4ea-af92-4dac-a245-d91c5fd384a5"
 			}
 		},
 		"metadata": {
@@ -45,7 +45,7 @@
 				"memory": 56,
 				"automaticScaleJobs": false
 			},
-			"sessionKeepAliveTimeout": 30
+			"sessionKeepAliveTimeout": 120
 		},
 		"cells": [
 			{
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 1
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -79,10 +79,12 @@
 					"using Newtonsoft.Json;\n",
 					"using System.Data.SqlClient;\n",
 					"using System.Data;\n",
+					"using System.Threading;\n",
+					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;\n",
 					"\n",
-					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
+					"using System.Collections.Concurrent;"
 				],
-				"execution_count": 2
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -226,7 +228,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 13
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -267,7 +269,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 4
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -306,7 +308,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 15
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -355,7 +357,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 6
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -415,7 +417,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 7
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -457,7 +459,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 8
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -509,7 +511,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 9
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -564,7 +566,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 10
+				"execution_count": 52
 			},
 			{
 				"cell_type": "code",
@@ -599,7 +601,7 @@
 					"    \"SnapshotSerengetiS11.json\"\n",
 					"};"
 				],
-				"execution_count": 25
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -616,23 +618,88 @@
 				},
 				"source": [
 					"var dataset = new SerengetiData();\n",
-					"var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };\n",
+					"var resetEvent = new ManualResetEvent(false);\n",
+					"int filesLeft = seasonFiles.Count;\n",
 					"\n",
-					"Parallel.ForEach(seasonFiles, options, async file =>\n",
+					"\n",
+					"Parallel.ForEach(seasonFiles, async file =>\n",
 					"{\n",
 					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
 					"    var data = await ReadJsonFileAsync<SerengetiData>(blob);\n",
 					"\n",
 					"    lock (dataset)\n",
 					"    {\n",
-					"        dataset.Categories.AddRange(data.Categories);\n",
+					"        if(seasonFiles.IndexOf(file)==1)\n",
+					"            dataset.Categories.AddRange(data.Categories);\n",
+					"            \n",
 					"        dataset.Annotations.AddRange(data.Annotations);\n",
 					"        dataset.Images.AddRange(data.Images);\n",
 					"    }\n",
+					"\n",
+					"    if (Interlocked.Decrement(ref filesLeft) == 0)\n",
+					"    {\n",
+					"        resetEvent.Set();\n",
+					"    }\n",
 					"});\n",
+					"\n",
+					"resetEvent.WaitOne();"
+				],
+				"execution_count": 54
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"await BulkInsertImages(dataset.Images);"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"await BulkInsertAnnotations(dataset.Annotations);"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"await BulkInsertCategories(dataset.Categories);\n",
 					""
 				],
-				"execution_count": 26
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -648,37 +715,12 @@
 					}
 				},
 				"source": [
-					"Console.WriteLine(dataset.Annotations.Count);"
-				],
-				"execution_count": 28
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"var dataset = new SerengetiData();\n",
+					"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
+					"var splitData = await ReadJsonFileAsync<dynamic>(blob);\n",
 					"\n",
-					"foreach(var file in seasonFiles)\n",
-					"{\n",
-					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
-					"    var data = await ReadJsonFile<SerengetiData>(blob);\n",
-					"\n",
-					"    dataset.Categories.AddRange(data.Categories);\n",
-					"    dataset.Annotations.AddRange(data.Annotations);\n",
-					"    dataset.Images.AddRange(data.Images);\n",
-					"}"
+					"await BulkInsertSplits(splitData);"
 				],
-				"execution_count": 12
+				"execution_count": null
 			}
 		]
 	}
