@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "9",
 				"spark.dynamicAllocation.maxExecutors": "9",
-				"spark.autotune.trackingId": "3ecbbd6e-52b6-4339-88f7-292f92726690"
+				"spark.autotune.trackingId": "9085b78b-22ac-4235-9ae3-ef8a1c7ff089"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -84,7 +84,7 @@
 					"\n",
 					"using System.Collections.Concurrent;"
 				],
-				"execution_count": 2
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -228,7 +228,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 3
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -269,7 +269,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 4
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -308,7 +308,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 5
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -357,7 +357,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 6
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -417,7 +417,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 7
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -450,6 +450,7 @@
 					"            var row = dataTable.NewRow();\n",
 					"            row[\"id\"] = category.Id;\n",
 					"            row[\"name\"] = category.Name;\n",
+					"            dataTable.Rows.Add(row);\n",
 					"        }\n",
 					"\n",
 					"        await Task.Run(() => bulkCpy.WriteToServer(dataTable));\n",
@@ -459,7 +460,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 8
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -511,7 +512,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 9
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -527,46 +528,27 @@
 					}
 				},
 				"source": [
-					"private async Task BulkInsertSplits(dynamic splitData)\n",
+					"private async Task InsertSplitImages(string table, List<string> locations)\n",
 					"{\n",
 					"    await sqlConn.OpenAsync();\n",
 					"\n",
-					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
+					"    using (SqlCommand command = new SqlCommand($\"INSERT INTO {table} (image_id) SELECT image_id FROM annotations WHERE seq_id IN (@locations)\", sqlConn))\n",
 					"    {\n",
-					"        bulkCpy.DestinationTableName = \"train\";\n",
+					"        var locParam = command.CreateParameter();\n",
+					"        locParam.ParameterName = \"@locations\";\n",
+					"        locParam.DbType = DbType.String;\n",
+					"        locParam.Value = string.Join(\",\", locations);\n",
 					"\n",
-					"        var dataTable = new DataTable();\n",
-					"        dataTable.Columns.Add(\"location\", typeof(string));\n",
+					"        command.Parameters.Add(locParam);\n",
 					"\n",
-					"        foreach (var loc in splitData.splits.train)\n",
-					"        {\n",
-					"            var row = dataTable.NewRow();\n",
-					"            row[\"location\"] = loc;\n",
-					"            dataTable.Rows.Add(row);\n",
-					"        }\n",
-					"\n",
-					"        await bulkCpy.WriteToServerAsync(dataTable);\n",
+					"        command.ExecuteNonQuery();\n",
 					"    }\n",
 					"\n",
-					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
-					"    {\n",
-					"        bulkCpy.DestinationTableName = \"val\";\n",
+					"    await sqlConn.CloseAsync();\n",
 					"\n",
-					"        var dataTable = new DataTable();\n",
-					"        dataTable.Columns.Add(\"location\", typeof(string));\n",
-					"\n",
-					"        foreach (var loc in splitData.splits.val)\n",
-					"        {\n",
-					"            var row = dataTable.NewRow();\n",
-					"            row[\"location\"] = loc;\n",
-					"            dataTable.Rows.Add(row);\n",
-					"        }\n",
-					"\n",
-					"        await bulkCpy.WriteToServerAsync(dataTable);\n",
-					"    }\n",
 					"}"
 				],
-				"execution_count": 10
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -601,7 +583,7 @@
 					"    \"SnapshotSerengetiS11.json\"\n",
 					"};"
 				],
-				"execution_count": 11
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -630,11 +612,9 @@
 					"}\n",
 					"\n",
 					"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
-					"var splitData = await ReadJsonFileAsync<dynamic>(blob);\n",
-					"\n",
-					"await BulkInsertSplits(splitData);"
+					"var splitData = await ReadJsonFileAsync<dynamic>(blob);"
 				],
-				"execution_count": 12
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -650,7 +630,8 @@
 					}
 				},
 				"source": [
-					""
+					"await InsertSplitImages(\"train\", splitData.splits.train);\n",
+					"await InsertSplitImages(\"val\", splitData.splits.val);"
 				],
 				"execution_count": null
 			}
