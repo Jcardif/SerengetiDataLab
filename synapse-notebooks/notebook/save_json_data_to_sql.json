@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "9",
 				"spark.dynamicAllocation.maxExecutors": "9",
-				"spark.autotune.trackingId": "d13aed34-7ab4-42a5-a90a-9b5088149b84"
+				"spark.autotune.trackingId": "1f50235c-cf4b-4e16-a69f-0454026ac69f"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 64
+				"execution_count": 62
 			},
 			{
 				"cell_type": "code",
@@ -84,7 +84,7 @@
 					"\n",
 					"using System.Collections.Concurrent;"
 				],
-				"execution_count": 65
+				"execution_count": 63
 			},
 			{
 				"cell_type": "code",
@@ -228,7 +228,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 66
+				"execution_count": 64
 			},
 			{
 				"cell_type": "code",
@@ -246,17 +246,13 @@
 				"source": [
 					"CloudBlobContainer blobContainer;\n",
 					"CloudBlobDirectory blobDirectory;\n",
-					"SqlConnection sqlConn;\n",
+					"//int batchSize = 500;\n",
 					"\n",
 					"var accountKey = Credentials.GetSecret(\"VaultSerengeti\",\"ADLS-AccessKey\");\n",
 					"string storageConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";\n",
 					"\n",
 					"var password = Credentials.GetSecret(\"VaultSerengeti\",\"SqlPoolPassword\");\n",
-					"var dbConnectionString = $\"Server=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=dedicateddef;Persist Security Info=False;User ID=sqladminuser;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;\";\n",
-					"\n",
-					"var sqlCon = new SqlConnection(dbConnectionString);\n",
-					"\n",
-					"sqlCon.OpenAsync();\n",
+					"var dbConnectionString = $\"Server=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=dedicateddef;Persist Security Info=False;User ID=sqladminuser;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;\";\n",
 					"\n",
 					"private void InitStorageAndDb()\n",
 					"{\n",
@@ -266,10 +262,9 @@
 					"    var blobClient= storageAccount.CreateCloudBlobClient();\n",
 					"    blobContainer =  blobClient.GetContainerReference(\"snapshot-serengeti\");\n",
 					"    blobDirectory = blobContainer.GetDirectoryReference(\"metadata\");\n",
-					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 67
+				"execution_count": 65
 			},
 			{
 				"cell_type": "code",
@@ -308,7 +303,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 68
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -335,29 +330,28 @@
 					"        {\"val\", \"CREATE TABLE val ( image_id VARCHAR(255));\"}\n",
 					"    };\n",
 					"\n",
-					"\n",
-					"    await sqlConn.OpenAsync();\n",
-					"\n",
-					"    foreach(var command in commands)\n",
+					"    using(var conn = new SqlConnection(dbConnectionString))\n",
 					"    {\n",
-					"        using(SqlCommand sqlCmd =new SqlCommand(command.Value, sqlConn))\n",
+					"        await conn.OpenAsync();\n",
+					"        foreach(var command in commands)\n",
 					"        {\n",
-					"            try\n",
+					"            using(SqlCommand sqlCmd =new SqlCommand(command.Value, conn))\n",
 					"            {\n",
-					"                await sqlCmd.ExecuteNonQueryAsync();\n",
-					"                Console.WriteLine($\"Table {command.Key} created successfully.\");\n",
-					"            }\n",
-					"            catch(Exception ex)\n",
-					"            {\n",
-					"                Console.WriteLine($\"Error creating table {command.Key}: \" + ex.Message);\n",
-					"            }\n",
-					"        }   \n",
+					"                try\n",
+					"                {\n",
+					"                    await sqlCmd.ExecuteNonQueryAsync();\n",
+					"                    Console.WriteLine($\"Table {command.Key} created successfully.\");\n",
+					"                }\n",
+					"                catch(Exception ex)\n",
+					"                {\n",
+					"                    Console.WriteLine($\"Error creating table {command.Key}: \" + ex.Message);\n",
+					"                }\n",
+					"            }   \n",
+					"        }\n",
 					"    }\n",
-					"\n",
-					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 69
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -375,45 +369,141 @@
 				"source": [
 					"private async Task BulkInsertImages(List<Image> images)\n",
 					"{\n",
-					"    await sqlConn.OpenAsync();\n",
-					"\n",
-					"    using(var bulkCpy = new SqlBulkCopy(sqlConn))\n",
+					"    using(var conn = new SqlConnection(dbConnectionString))\n",
 					"    {\n",
-					"        bulkCpy.DestinationTableName=\"images\";\n",
-					"\n",
-					"        var dataTable = new DataTable();\n",
-					"        dataTable.Columns.Add(\"id\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"file_name\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"frame_num\", typeof(long));\n",
-					"        dataTable.Columns.Add(\"seq_id\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"width\", typeof(long));\n",
-					"        dataTable.Columns.Add(\"height\", typeof(long));\n",
-					"        dataTable.Columns.Add(\"corrupt\", typeof(bool));\n",
-					"        dataTable.Columns.Add(\"location\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"seq_num_frames\", typeof(long));\n",
-					"        dataTable.Columns.Add(\"datetime\", typeof(DateTime));\n",
-					"\n",
-					"        foreach (var image in images)\n",
+					"        await conn.OpenAsync();\n",
+					"        using(var bulkCpy = new SqlBulkCopy(conn))\n",
 					"        {\n",
-					"            var row = dataTable.NewRow();\n",
-					"            row[\"id\"] = image.Id;\n",
-					"            row[\"file_name\"] = image.FileName;\n",
-					"            row[\"frame_num\"] = image.FrameNum;\n",
-					"            row[\"seq_id\"] = image.SeqId;\n",
-					"            row[\"width\"] = image.Width;\n",
-					"            row[\"height\"] = image.Height;\n",
-					"            row[\"corrupt\"] = image.Corrupt;\n",
-					"            row[\"location\"] = image.Location;\n",
-					"            row[\"seq_num_frames\"] = image.SeqNumFrames;\n",
-					"            row[\"datetime\"] = image.Datetime.DateTime;\n",
+					"            bulkCpy.DestinationTableName=\"images\";\n",
 					"\n",
-					"            dataTable.Rows.Add(row);\n",
+					"            var dataTable = new DataTable();\n",
+					"            dataTable.Columns.Add(\"id\", typeof(string));\n",
+					"            dataTable.Columns.Add(\"file_name\", typeof(string));\n",
+					"            dataTable.Columns.Add(\"frame_num\", typeof(long));\n",
+					"            dataTable.Columns.Add(\"seq_id\", typeof(string));\n",
+					"            dataTable.Columns.Add(\"width\", typeof(long));\n",
+					"            dataTable.Columns.Add(\"height\", typeof(long));\n",
+					"            dataTable.Columns.Add(\"corrupt\", typeof(bool));\n",
+					"            dataTable.Columns.Add(\"location\", typeof(string));\n",
+					"            dataTable.Columns.Add(\"seq_num_frames\", typeof(long));\n",
+					"            dataTable.Columns.Add(\"datetime\", typeof(DateTime));\n",
+					"\n",
+					"            foreach (var image in images)\n",
+					"            {\n",
+					"                var row = dataTable.NewRow();\n",
+					"                row[\"id\"] = image.Id;\n",
+					"                row[\"file_name\"] = image.FileName;\n",
+					"                row[\"frame_num\"] = image.FrameNum;\n",
+					"                row[\"seq_id\"] = image.SeqId;\n",
+					"                row[\"width\"] = image.Width;\n",
+					"                row[\"height\"] = image.Height;\n",
+					"                row[\"corrupt\"] = image.Corrupt;\n",
+					"                row[\"location\"] = image.Location;\n",
+					"                row[\"seq_num_frames\"] = image.SeqNumFrames;\n",
+					"                row[\"datetime\"] = image.Datetime.DateTime;\n",
+					"\n",
+					"                dataTable.Rows.Add(row);\n",
+					"            }\n",
+					"\n",
+					"            await Task.Run(() => bulkCpy.WriteToServer(dataTable));\n",
 					"        }\n",
-					"\n",
-					"        await Task.Run(() => bulkCpy.WriteToServer(dataTable));\n",
 					"    }\n",
+					"}\n",
+					""
+				],
+				"execution_count": 68
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"private async Task BulkInsertCategories(List<Category> categories)\n",
+					"{\n",
+					"    using(var conn = new SqlConnection(dbConnectionString))\n",
+					"    {\n",
+					"        await conn.OpenAsync();\n",
+					"        using (var bulkCpy = new SqlBulkCopy(conn))\n",
+					"        {\n",
+					"            bulkCpy.DestinationTableName = \"categories\";\n",
 					"\n",
-					"    await sqlConn.CloseAsync();\n",
+					"            var dataTable = new DataTable();\n",
+					"            dataTable.Columns.Add(\"id\", typeof(long));\n",
+					"            dataTable.Columns.Add(\"name\", typeof(string));\n",
+					"\n",
+					"            foreach(var category in categories)\n",
+					"            {\n",
+					"                var row = dataTable.NewRow();\n",
+					"                row[\"id\"] = category.Id;\n",
+					"                row[\"name\"] = category.Name;\n",
+					"                dataTable.Rows.Add(row);\n",
+					"            }\n",
+					"\n",
+					"            await Task.Run(() => bulkCpy.WriteToServer(dataTable));\n",
+					"        }\n",
+					"    }\n",
+					"}\n",
+					""
+				],
+				"execution_count": 69
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"private async Task BulkInsertAnnotations(List<Annotation> annotations)\n",
+					"{\n",
+					"    using(var conn = new SqlConnection(dbConnectionString))\n",
+					"    {\n",
+					"        await conn.OpenAsync();\n",
+					"        using (var bulkCpy = new SqlBulkCopy(conn))\n",
+					"        {\n",
+					"            bulkCpy.DestinationTableName = \"annotations\";\n",
+					"\n",
+					"            var dataTable = new DataTable();\n",
+					"            dataTable.Columns.Add(\"id\", typeof(string));\n",
+					"            dataTable.Columns.Add(\"category_id\", typeof(long));\n",
+					"            dataTable.Columns.Add(\"seq_id\", typeof(string));\n",
+					"            dataTable.Columns.Add(\"season\", typeof(string));\n",
+					"            dataTable.Columns.Add(\"datetime\", typeof(DateTime));\n",
+					"            dataTable.Columns.Add(\"image_id\", typeof(string));\n",
+					"            dataTable.Columns.Add(\"location\", typeof(string));\n",
+					"\n",
+					"            foreach (var annotation in annotations)\n",
+					"            {\n",
+					"                var row = dataTable.NewRow();\n",
+					"                row[\"id\"] = annotation.Id;\n",
+					"                row[\"category_id\"] = annotation.CategoryId;\n",
+					"                row[\"seq_id\"] = annotation.SeqId;\n",
+					"                row[\"season\"] = annotation.Season;\n",
+					"                row[\"datetime\"] = annotation.Datetime.LocalDateTime;\n",
+					"                row[\"image_id\"] = annotation.ImageId;\n",
+					"                row[\"location\"] = annotation.Location;\n",
+					"                dataTable.Rows.Add(row);\n",
+					"            }\n",
+					"\n",
+					"            await bulkCpy.WriteToServerAsync(dataTable);\n",
+					"        }\n",
+					"    }\n",
 					"}\n",
 					""
 				],
@@ -433,123 +523,19 @@
 					}
 				},
 				"source": [
-					"private async Task BulkInsertCategories(List<Category> categories)\n",
-					"{\n",
-					"    await sqlConn.OpenAsync();\n",
-					"\n",
-					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
-					"    {\n",
-					"        bulkCpy.DestinationTableName = \"categories\";\n",
-					"\n",
-					"        var dataTable = new DataTable();\n",
-					"        dataTable.Columns.Add(\"id\", typeof(long));\n",
-					"        dataTable.Columns.Add(\"name\", typeof(string));\n",
-					"\n",
-					"        foreach(var category in categories)\n",
-					"        {\n",
-					"            var row = dataTable.NewRow();\n",
-					"            row[\"id\"] = category.Id;\n",
-					"            row[\"name\"] = category.Name;\n",
-					"            dataTable.Rows.Add(row);\n",
-					"        }\n",
-					"\n",
-					"        await Task.Run(() => bulkCpy.WriteToServer(dataTable));\n",
-					"    }\n",
-					"\n",
-					"    await sqlConn.CloseAsync();\n",
-					"}\n",
-					""
-				],
-				"execution_count": 71
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"private async Task BulkInsertAnnotations(List<Annotation> annotations)\n",
-					"{\n",
-					"    await sqlConn.OpenAsync();\n",
-					"\n",
-					"    using (var bulkCpy = new SqlBulkCopy(sqlConn))\n",
-					"    {\n",
-					"        bulkCpy.DestinationTableName = \"annotations\";\n",
-					"\n",
-					"        var dataTable = new DataTable();\n",
-					"        dataTable.Columns.Add(\"id\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"category_id\", typeof(long));\n",
-					"        dataTable.Columns.Add(\"seq_id\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"season\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"datetime\", typeof(DateTime));\n",
-					"        dataTable.Columns.Add(\"image_id\", typeof(string));\n",
-					"        dataTable.Columns.Add(\"location\", typeof(string));\n",
-					"\n",
-					"        foreach (var annotation in annotations)\n",
-					"        {\n",
-					"            var row = dataTable.NewRow();\n",
-					"            row[\"id\"] = annotation.Id;\n",
-					"            row[\"category_id\"] = annotation.CategoryId;\n",
-					"            row[\"seq_id\"] = annotation.SeqId;\n",
-					"            row[\"season\"] = annotation.Season;\n",
-					"            row[\"datetime\"] = annotation.Datetime.LocalDateTime;\n",
-					"            row[\"image_id\"] = annotation.ImageId;\n",
-					"            row[\"location\"] = annotation.Location;\n",
-					"            dataTable.Rows.Add(row);\n",
-					"        }\n",
-					"\n",
-					"        await bulkCpy.WriteToServerAsync(dataTable);\n",
-					"    }\n",
-					"    await sqlConn.CloseAsync();\n",
-					"}\n",
-					""
-				],
-				"execution_count": 72
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
 					"private async Task InsertSplitImages(string table, List<string> locations)\n",
 					"{\n",
-					"    await sqlConn.OpenAsync();\n",
-					"\n",
-					"    using (SqlCommand command = new SqlCommand(@$\"\n",
-					"        INSERT INTO {table} (image_id)\n",
-					"        SELECT annotations.image_id\n",
-					"        FROM annotations\n",
-					"        JOIN (\n",
-					"            SELECT '{string.Join(\"' UNION SELECT '\", locations)}' AS location\n",
-					"        ) loc\n",
-					"        ON annotations.location = loc.location\n",
-					"    \", sqlConn))\n",
+					"    using(var conn = new SqlConnection(dbConnectionString))\n",
 					"    {\n",
-					"        command.ExecuteNonQuery();\n",
+					"        await conn.OpenAsync();\n",
+					"        using (SqlCommand command = new SqlCommand($\"INSERT INTO {table} (image_id) SELECT image_id FROM annotations WHERE location IN ({string.Join(\",\", locations.Select(x => $\"'{x}'\"))})\", conn))\n",
+					"        {\n",
+					"            command.ExecuteNonQuery();\n",
+					"        }\n",
 					"    }\n",
-					"\n",
-					"    await sqlConn.CloseAsync();\n",
-					"}\n",
-					""
+					"}"
 				],
-				"execution_count": 73
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -584,7 +570,7 @@
 					"    \"SnapshotSerengetiS11.json\"\n",
 					"};"
 				],
-				"execution_count": 74
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -610,18 +596,27 @@
 					"\n",
 					"Console.WriteLine($\"Completed processing {firstFile} \");\n",
 					"\n",
-					"for (int i = 1; i < seasonFiles.Count; i++)\n",
-					"{\n",
-					"    var file = seasonFiles[i];\n",
-					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
-					"    var serengetiData = await ReadJsonFileAsync<SerengetiData>(blob);\n",
-					"    await BulkInsertImages(serengetiData.Images);\n",
-					"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
 					"\n",
-					"    Console.WriteLine($\"Completed processing {file} \");\n",
-					"}"
+					"var tasks = new List<Task>();\n",
+					"\n",
+					"Parallel.For(1, seasonFiles.Count, i =>\n",
+					"{\n",
+					"    tasks.Add(Task.Run(async () =>\n",
+					"    {\n",
+					"        var file = seasonFiles[i];\n",
+					"        var blob = blobDirectory.GetBlockBlobReference(file);\n",
+					"        var serengetiData = await ReadJsonFileAsync<SerengetiData>(blob);\n",
+					"        await BulkInsertImages(serengetiData.Images);\n",
+					"        await BulkInsertAnnotations(serengetiData.Annotations);\n",
+					"\n",
+					"        Console.WriteLine($\"Completed processing {file} \");\n",
+					"    }));\n",
+					"});\n",
+					"\n",
+					"await Task.WhenAll(tasks);\n",
+					""
 				],
-				"execution_count": null
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",
@@ -637,10 +632,13 @@
 					}
 				},
 				"source": [
+					"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
+					"var splitData = await ReadJsonFileAsync<dynamic>(blob);\n",
+					"\n",
 					"await InsertSplitImages(\"train\", splitData.splits.train.ToObject<List<string>>());\n",
 					"await InsertSplitImages(\"val\", splitData.splits.val.ToObject<List<string>>());"
 				],
-				"execution_count": null
+				"execution_count": 74
 			}
 		]
 	}
