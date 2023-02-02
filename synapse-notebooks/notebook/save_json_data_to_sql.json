@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "9",
 				"spark.dynamicAllocation.maxExecutors": "9",
-				"spark.autotune.trackingId": "9085b78b-22ac-4235-9ae3-ef8a1c7ff089"
+				"spark.autotune.trackingId": "77287205-b8f9-46cb-9b04-d111115aeedd"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 2
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -84,7 +84,7 @@
 					"\n",
 					"using System.Collections.Concurrent;"
 				],
-				"execution_count": 3
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -228,7 +228,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 4
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
@@ -269,7 +269,7 @@
 					"    sqlConn = new SqlConnection(dbConnectionString);\n",
 					"}"
 				],
-				"execution_count": 5
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -308,7 +308,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 6
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -331,8 +331,8 @@
 					"        {\"images\", \"CREATE TABLE images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\"},\n",
 					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(255));\"},\n",
 					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(255) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"},\n",
-					"        {\"train\", \"CREATE TABLE train ( location VARCHAR(255));\"},\n",
-					"        {\"val\", \"CREATE TABLE val ( location VARCHAR(255));\"}\n",
+					"        {\"train\", \"CREATE TABLE train ( image_id VARCHAR(255));\"},\n",
+					"        {\"val\", \"CREATE TABLE val ( image_id VARCHAR(255));\"}\n",
 					"    };\n",
 					"\n",
 					"\n",
@@ -357,7 +357,7 @@
 					"    await sqlConn.CloseAsync();\n",
 					"}"
 				],
-				"execution_count": 7
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -417,7 +417,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 8
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -460,7 +460,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 9
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -512,7 +512,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 10
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -548,7 +548,7 @@
 					"\n",
 					"}"
 				],
-				"execution_count": 11
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -583,7 +583,7 @@
 					"    \"SnapshotSerengetiS11.json\"\n",
 					"};"
 				],
-				"execution_count": 12
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -599,22 +599,28 @@
 					}
 				},
 				"source": [
-					"foreach (var file in seasonFiles)\n",
+					"var firstFile = seasonFiles.First();\n",
+					"var firstBlob = blobDirectory.GetBlockBlobReference(firstFile);\n",
+					"var firstSerengetiData = await ReadJsonFileAsync<SerengetiData>(firstBlob);\n",
+					"\n",
+					"await BulkInsertCategories(firstSerengetiData.Categories);\n",
+					"await BulkInsertImages(firstSerengetiData.Images);\n",
+					"await BulkInsertAnnotations(firstSerengetiData.Annotations);\n",
+					"\n",
+					"Console.WriteLine($\"Completed processing {firstFile} \");\n",
+					"\n",
+					"for (int i = 1; i < seasonFiles.Count; i++)\n",
 					"{\n",
+					"    var file = seasonFiles[i];\n",
 					"    var blob = blobDirectory.GetBlockBlobReference(file);\n",
-					"    var serengetiData=await ReadJsonFileAsync<SerengetiData>(blob);\n",
-					"\n",
-					"    if(seasonFiles.IndexOf(file) == 1)\n",
-					"        await BulkInsertCategories(serengetiData.Categories);\n",
-					"\n",
+					"    var serengetiData = await ReadJsonFileAsync<SerengetiData>(blob);\n",
 					"    await BulkInsertImages(serengetiData.Images);\n",
 					"    await BulkInsertAnnotations(serengetiData.Annotations);\n",
-					"}\n",
 					"\n",
-					"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
-					"var splitData = await ReadJsonFileAsync<dynamic>(blob);"
+					"    Console.WriteLine($\"Completed processing {file} \");\n",
+					"}"
 				],
-				"execution_count": 13
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -630,8 +636,11 @@
 					}
 				},
 				"source": [
-					"await InsertSplitImages(\"train\", splitData.splits.train);\n",
-					"await InsertSplitImages(\"val\", splitData.splits.val);"
+					"var blob = blobDirectory.GetBlockBlobReference(\"SnapshotSerengetiSplits_v0.json\");\n",
+					"var splitData = await ReadJsonFileAsync<dynamic>(blob);\n",
+					"\n",
+					"await InsertSplitImages(\"train\", splitData.splits.train.ToObject<List<string>>());\n",
+					"await InsertSplitImages(\"val\", splitData.splits.val.ToObject<List<string>>());"
 				],
 				"execution_count": null
 			}

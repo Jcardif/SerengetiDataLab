@@ -2,7 +2,7 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "SELECT * FROM  val",
+			"query": "SELECT * FROM  categories",
 			"metadata": {
 				"language": "sql"
 			},
