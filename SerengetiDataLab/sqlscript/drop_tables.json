@@ -2,7 +2,7 @@
 	"name": "drop_tables",
 	"properties": {
 		"content": {
-			"query": "DROP TABLE val\nDROP TABLE train\nDROP TABLE images\nDROP TABLE categories\nDROP TABLE annotations\n",
+			"query": "DROP TABLE val\nDROP TABLE train\nDROP TABLE images\nDROP TABLE categories\nDROP TABLE annotations",
 			"metadata": {
 				"language": "sql"
 			},

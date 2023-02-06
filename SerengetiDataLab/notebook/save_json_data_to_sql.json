@@ -18,15 +18,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "9",
 				"spark.dynamicAllocation.maxExecutors": "9",
-				"spark.autotune.trackingId": "03af63ad-26c8-49fd-926c-3358d7179a9f"
+				"spark.autotune.trackingId": "cee35190-91ee-4def-a43d-089f567bc050"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_sparkdotnet",
-				"display_name": "csharp"
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "csharp"
@@ -38,14 +38,13 @@
 				"endpoint": "https://serengetidatalab.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/DefaultPool",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.3",
 				"nodeCount": 10,
 				"cores": 16,
 				"memory": 112,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 120
 		},
@@ -59,7 +58,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 62
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -86,7 +85,7 @@
 					"\n",
 					"using System.Collections.Concurrent;"
 				],
-				"execution_count": 63
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -230,7 +229,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 64
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -266,7 +265,7 @@
 					"    blobDirectory = blobContainer.GetDirectoryReference(\"metadata\");\n",
 					"}"
 				],
-				"execution_count": 65
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -305,7 +304,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 66
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -328,8 +327,8 @@
 					"        {\"images\", \"CREATE TABLE images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\"},\n",
 					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(255));\"},\n",
 					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(255) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"},\n",
-					"        {\"train\", \"CREATE TABLE train ( image_id VARCHAR(255));\"},\n",
-					"        {\"val\", \"CREATE TABLE val ( image_id VARCHAR(255));\"}\n",
+					"        {\"train\", \"CREATE TABLE train ( image_id VARCHAR(255), category_id INT );\"},\n",
+					"        {\"val\", \"CREATE TABLE val ( image_id VARCHAR(255), category_id INT );\"}\n",
 					"    };\n",
 					"\n",
 					"    using(var conn = new SqlConnection(dbConnectionString))\n",
@@ -353,7 +352,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 67
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -413,7 +412,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 68
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -456,7 +455,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 69
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -509,7 +508,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 70
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -530,14 +529,14 @@
 					"    using(var conn = new SqlConnection(dbConnectionString))\n",
 					"    {\n",
 					"        await conn.OpenAsync();\n",
-					"        using (SqlCommand command = new SqlCommand($\"INSERT INTO {table} (image_id) SELECT image_id FROM annotations WHERE location IN ({string.Join(\",\", locations.Select(x => $\"'{x}'\"))})\", conn))\n",
+					"        using (SqlCommand command = new SqlCommand($\"INSERT INTO {table} (image_id, category_id) SELECT image_id, category_id FROM annotations WHERE location IN ({string.Join(\",\", locations.Select(x => $\"'{x}'\"))})\", conn))\n",
 					"        {\n",
 					"            command.ExecuteNonQuery();\n",
 					"        }\n",
 					"    }\n",
 					"}"
 				],
-				"execution_count": 71
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -572,7 +571,7 @@
 					"    \"SnapshotSerengetiS11.json\"\n",
 					"};"
 				],
-				"execution_count": 72
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -618,7 +617,7 @@
 					"await Task.WhenAll(tasks);\n",
 					""
 				],
-				"execution_count": 73
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -640,7 +639,7 @@
 					"await InsertSplitImages(\"train\", splitData.splits.train.ToObject<List<string>>());\n",
 					"await InsertSplitImages(\"val\", splitData.splits.val.ToObject<List<string>>());"
 				],
-				"execution_count": 74
+				"execution_count": null
 			}
 		]
 	}
