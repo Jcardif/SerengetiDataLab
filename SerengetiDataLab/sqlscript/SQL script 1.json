@@ -2,7 +2,7 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "DELETE FROM val\n\nSELECT * FROM val\n\nSELECT TOP (100) * FROM train\n\nSELECT * from categories\n",
+			"query": "DELETE FROM val\n\nSELECT * FROM val\n\nSELECT TOP (100) * FROM train\n\nSELECT name from categories\n\nSELECT STRING_AGG(name, ',') AS Result FROM categories\n\n\n",
 			"metadata": {
 				"language": "sql"
 			},
