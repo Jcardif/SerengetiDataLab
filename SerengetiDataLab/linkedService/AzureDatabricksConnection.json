@@ -1,0 +1,17 @@
+{
+	"name": "AzureDatabricksConnection",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-1149231102205442.2.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/SerengetiDataLab/providers/Microsoft.Databricks/workspaces/AzDatabricksSerengeti",
+			"existingClusterId": "0204-203448-hi23s9x3"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
