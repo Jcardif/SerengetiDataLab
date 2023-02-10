@@ -1,7 +1,8 @@
-param location string = 'eastus'
+param location string 
+param storageAccountName string 
 
 resource serengetiDataLake 'Microsoft.Storage/storageAccounts@2022-09-01'= {
-  name: 'serengetiDataLake'
+  name: storageAccountName
   location: location
   sku: {
     name: 'Standard_LRS'
