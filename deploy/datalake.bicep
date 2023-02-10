@@ -13,4 +13,10 @@ resource serengetiDataLake 'Microsoft.Storage/storageAccounts@2022-09-01'= {
     supportsHttpsTrafficOnly: true
     isHnsEnabled: true
   }
+
 }
+
+  // output accountUrl and rersource id
+  output accountUrl string = serengetiDataLake.properties.primaryEndpoints.blob
+  output resourceId string = serengetiDataLake.id
+

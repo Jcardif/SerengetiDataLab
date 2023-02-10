@@ -1,9 +1,4 @@
-param location string = 'eastus'
-
-resource SerengetiSynapse 'Microsoft.Synapse/workspaces@2021-06-01' = {
-  location: location
-  name: 'SerengetiDataLab'
-  properties:{
-    defaultDataLakeStorage:
-  }
-}
+param location string = resourceGroup().location
+param synapseWorkspaceName string = 'SerengetiDataLab${uniqueString(resourceGroup().id)}'
+param storageAccountName string = 'serengetidatalake${uniqueString(resourceGroup().id)}'
+param fileSystemName string = 'synapsedef'
