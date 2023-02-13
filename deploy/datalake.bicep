@@ -20,3 +20,7 @@ resource serengetiDataLake 'Microsoft.Storage/storageAccounts@2022-09-01'= {
   output accountUrl string = serengetiDataLake.properties.primaryEndpoints.blob
   output resourceId string = serengetiDataLake.id
 
+  // todo: fix secret output
+#disable-next-line outputs-should-not-contain-secrets
+  output storageAccountKey string = serengetiDataLake.listKeys().keys[0].value
+

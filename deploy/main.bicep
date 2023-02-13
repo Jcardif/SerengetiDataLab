@@ -30,5 +30,51 @@ module synapseWorkspace 'synapse.bicep' = {
   }
 }
 
+resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
+  name: vaultName
+  location: location
+  properties: {
+    tenantId: subscription().tenantId
+    sku: {
+      name: 'standard'
+      family: 'A'
+    }
+    accessPolicies: [
+      {
+        tenantId: subscription().tenantId
+        objectId: synapseWorkspace.outputs.synapseWorkspaceId
+        permissions: {
+          keys: [
+            'get'
+          ]
+          secrets: [
+            'get'
+            'list'
+          ]
+        }
+      }
+    ]
+    enabledForTemplateDeployment: true
+  }
+}
+
+// Create a secret
+resource passwordSecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' = {
+  name: '${keyVault.name}/SqlPoolPassword'
+  properties: {
+    value: sqlAdministratorLoginPassword
+    contentType: 'text/plain'
+  }
+}
+
+resource AccessKeySecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' = {
+  name: '${keyVault.name}/ADLS-AccessKey'
+  properties: {
+    value: defaultSynapseDataLake.outputs.storageAccountKey
+    contentType: 'text/plain'
+  }
+}
+
+
 
 
