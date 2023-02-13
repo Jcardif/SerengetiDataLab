@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "11235697184381852166"
+      "templateHash": "16603252945344846366"
     }
   },
   "parameters": {
@@ -92,7 +92,7 @@
       "name": "[variables('amlWorkspaceName')]",
       "location": "[parameters('location')]",
       "properties": {
-        "storageAccount": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.storageAccountName.value]"
+        "storageAccount": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.resourceId.value]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id)))]"
