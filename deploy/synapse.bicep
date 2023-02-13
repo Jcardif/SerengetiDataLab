@@ -8,6 +8,7 @@ param performanceLevel string = 'DW1000c'
 param capacity int = 100
 param sqlPoolTier string = 'Standard'
 param sqlAdministratorLogin string
+param mlsparkpoolName string = 'mlsparkpool'
 
 @secure()
 param sqlAdministratorLoginPassword string
@@ -33,7 +34,7 @@ resource synapseSerengeti 'Microsoft.Synapse/workspaces@2021-06-01' = {
   }
 }
 
-resource symbolicname 'Microsoft.Synapse/workspaces/sqlPools@2021-06-01' = {
+resource dedicateSqlPool 'Microsoft.Synapse/workspaces/sqlPools@2021-06-01' = {
   name: sqlPoolName
   location: location
   sku: {
@@ -47,6 +48,24 @@ resource symbolicname 'Microsoft.Synapse/workspaces/sqlPools@2021-06-01' = {
 
   }
 }
+
+resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
+  location: location
+  name: mlsparkpoolName
+  parent: synapseSerengeti
+  properties:{
+    nodeSize: 'Medium'
+    nodeSizeFamily: 'HardwareAcceleratedGPU'
+    nodeCount: 5
+    autoScale: {
+      enabled: true
+      minNodeCount: 3
+      maxNodeCount: 10
+    }
+  }
+}
+
+
 
 // output resource id of the synapse workspace
 output synapseWorkspaceId string = synapseSerengeti.id
