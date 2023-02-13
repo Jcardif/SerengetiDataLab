@@ -5,33 +5,13 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "3202648797140809716"
+      "templateHash": "4179383498387586434"
     }
   },
   "parameters": {
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]"
-    },
-    "synapseWorkspaceName": {
-      "type": "string",
-      "defaultValue": "[format('SerengetiDataLab{0}', uniqueString(resourceGroup().id))]"
-    },
-    "storageAccountName": {
-      "type": "string",
-      "defaultValue": "[format('serengetidatalake{0}', uniqueString(resourceGroup().id))]"
-    },
-    "fileSystemName": {
-      "type": "string",
-      "defaultValue": "synapsedef"
-    },
-    "vaultName": {
-      "type": "string",
-      "defaultValue": "[format('serengetiVault{0}', uniqueString(resourceGroup().id))]"
-    },
-    "amlWorkspaceName": {
-      "type": "string",
-      "defaultValue": "[format('SerengetiAML{0}', uniqueString(resourceGroup().id))]"
     },
     "sqlAdministratorLogin": {
       "type": "string",
@@ -41,11 +21,18 @@
       "type": "securestring"
     }
   },
+  "variables": {
+    "synapseWorkspaceName": "[format('SerengetiDataLab{0}', uniqueString(resourceGroup().id))]",
+    "storageAccountName": "[format('serengetidatalake{0}', uniqueString(resourceGroup().id))]",
+    "fileSystemName": "synapsedef",
+    "vaultName": "[format('serengetiVault{0}', uniqueString(resourceGroup().id))]",
+    "amlWorkspaceName": "[format('SerengetiAML{0}', uniqueString(resourceGroup().id))]"
+  },
   "resources": [
     {
       "type": "Microsoft.KeyVault/vaults",
       "apiVersion": "2021-06-01-preview",
-      "name": "[parameters('vaultName')]",
+      "name": "[variables('vaultName')]",
       "location": "[parameters('location')]",
       "properties": {
         "tenantId": "[subscription().tenantId]",
@@ -77,32 +64,32 @@
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
       "apiVersion": "2021-06-01-preview",
-      "name": "[format('{0}/SqlPoolPassword', parameters('vaultName'))]",
+      "name": "[format('{0}/SqlPoolPassword', variables('vaultName'))]",
       "properties": {
         "value": "[parameters('sqlAdministratorLoginPassword')]",
         "contentType": "text/plain"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults', parameters('vaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]"
       ]
     },
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
       "apiVersion": "2021-06-01-preview",
-      "name": "[format('{0}/ADLS-AccessKey', parameters('vaultName'))]",
+      "name": "[format('{0}/ADLS-AccessKey', variables('vaultName'))]",
       "properties": {
         "value": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.storageAccountKey.value]",
         "contentType": "text/plain"
       },
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id)))]",
-        "[resourceId('Microsoft.KeyVault/vaults', parameters('vaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]"
       ]
     },
     {
       "type": "Microsoft.MachineLearningServices/workspaces",
       "apiVersion": "2022-10-01",
-      "name": "[parameters('amlWorkspaceName')]",
+      "name": "[variables('amlWorkspaceName')]",
       "location": "[parameters('location')]",
       "properties": {
         "storageAccount": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.storageAccountName.value]"
@@ -125,7 +112,7 @@
             "value": "[parameters('location')]"
           },
           "storageAccountName": {
-            "value": "[parameters('storageAccountName')]"
+            "value": "[variables('storageAccountName')]"
           }
         },
         "template": {
@@ -198,10 +185,10 @@
             "value": "[parameters('location')]"
           },
           "synapseWorkspaceName": {
-            "value": "[parameters('synapseWorkspaceName')]"
+            "value": "[variables('synapseWorkspaceName')]"
           },
           "fileSystemName": {
-            "value": "[parameters('fileSystemName')]"
+            "value": "[variables('fileSystemName')]"
           },
           "storageAccountUrl": {
             "value": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.accountUrl.value]"

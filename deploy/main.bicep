@@ -1,9 +1,9 @@
 param location string = resourceGroup().location
-param synapseWorkspaceName string = 'SerengetiDataLab${uniqueString(resourceGroup().id)}'
-param storageAccountName string = 'serengetidatalake${uniqueString(resourceGroup().id)}'
-param fileSystemName string = 'synapsedef'
-param vaultName string = 'serengetiVault${uniqueString(resourceGroup().id)}'
-param amlWorkspaceName string = 'SerengetiAML${uniqueString(resourceGroup().id)}'
+var synapseWorkspaceName = 'SerengetiDataLab${uniqueString(resourceGroup().id)}'
+var storageAccountName = 'serengetidatalake${uniqueString(resourceGroup().id)}'
+var fileSystemName = 'synapsedef'
+var vaultName = 'serengetiVault${uniqueString(resourceGroup().id)}'
+var amlWorkspaceName = 'SerengetiAML${uniqueString(resourceGroup().id)}'
 
 param sqlAdministratorLogin string = 'sqladminuser'
 
