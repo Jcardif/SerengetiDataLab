@@ -1,6 +1,6 @@
 param location string = resourceGroup().location
 var synapseWorkspaceName = 'SerengetiDataLab${uniqueString(resourceGroup().id)}'
-var storageAccountName = 'serengetidatalake${uniqueString(resourceGroup().id)}'
+var storageAccountName = 'serengetiStore${uniqueString(resourceGroup().id)}'
 var fileSystemName = 'synapsedef'
 var vaultName = 'serengetiVault${uniqueString(resourceGroup().id)}'
 var amlWorkspaceName = 'SerengetiAML${uniqueString(resourceGroup().id)}'
