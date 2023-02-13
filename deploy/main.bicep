@@ -81,7 +81,7 @@ resource serengetiAml 'Microsoft.MachineLearningServices/workspaces@2022-10-01' 
   location: location
 
   properties:{
-    storageAccount: defaultSynapseDataLake.outputs.storageAccountNamecd 
+    storageAccount: defaultSynapseDataLake.outputs.storageAccountName
   }
 }
 
