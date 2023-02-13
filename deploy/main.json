@@ -1,0 +1,341 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.14.46.61228",
+      "templateHash": "3202648797140809716"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "synapseWorkspaceName": {
+      "type": "string",
+      "defaultValue": "[format('SerengetiDataLab{0}', uniqueString(resourceGroup().id))]"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "[format('serengetidatalake{0}', uniqueString(resourceGroup().id))]"
+    },
+    "fileSystemName": {
+      "type": "string",
+      "defaultValue": "synapsedef"
+    },
+    "vaultName": {
+      "type": "string",
+      "defaultValue": "[format('serengetiVault{0}', uniqueString(resourceGroup().id))]"
+    },
+    "amlWorkspaceName": {
+      "type": "string",
+      "defaultValue": "[format('SerengetiAML{0}', uniqueString(resourceGroup().id))]"
+    },
+    "sqlAdministratorLogin": {
+      "type": "string",
+      "defaultValue": "sqladminuser"
+    },
+    "sqlAdministratorLoginPassword": {
+      "type": "securestring"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[parameters('vaultName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        },
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceId.value]",
+            "permissions": {
+              "keys": [
+                "get"
+              ],
+              "secrets": [
+                "get",
+                "list"
+              ]
+            }
+          }
+        ],
+        "enabledForTemplateDeployment": true
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'synapseWorkspace')]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[format('{0}/SqlPoolPassword', parameters('vaultName'))]",
+      "properties": {
+        "value": "[parameters('sqlAdministratorLoginPassword')]",
+        "contentType": "text/plain"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('vaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[format('{0}/ADLS-AccessKey', parameters('vaultName'))]",
+      "properties": {
+        "value": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.storageAccountKey.value]",
+        "contentType": "text/plain"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id)))]",
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('vaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.MachineLearningServices/workspaces",
+      "apiVersion": "2022-10-01",
+      "name": "[parameters('amlWorkspaceName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "storageAccount": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.storageAccountName.value]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id)))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('storageAccountName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.14.46.61228",
+              "templateHash": "4296369179738125134"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "storageV2",
+              "properties": {
+                "accessTier": "Hot",
+                "supportsHttpsTrafficOnly": true,
+                "isHnsEnabled": true
+              }
+            }
+          ],
+          "outputs": {
+            "accountUrl": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').primaryEndpoints.blob]"
+            },
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            },
+            "storageAccountName": {
+              "type": "string",
+              "value": "[parameters('storageAccountName')]"
+            },
+            "storageAccountKey": {
+              "type": "string",
+              "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').keys[0].value]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "synapseWorkspace",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "synapseWorkspaceName": {
+            "value": "[parameters('synapseWorkspaceName')]"
+          },
+          "fileSystemName": {
+            "value": "[parameters('fileSystemName')]"
+          },
+          "storageAccountUrl": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.accountUrl.value]"
+          },
+          "storageResourceId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.resourceId.value]"
+          },
+          "sqlAdministratorLogin": {
+            "value": "[parameters('sqlAdministratorLogin')]"
+          },
+          "sqlAdministratorLoginPassword": {
+            "value": "[parameters('sqlAdministratorLoginPassword')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.14.46.61228",
+              "templateHash": "17760613786247519213"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "synapseWorkspaceName": {
+              "type": "string"
+            },
+            "fileSystemName": {
+              "type": "string"
+            },
+            "storageAccountUrl": {
+              "type": "string"
+            },
+            "storageResourceId": {
+              "type": "string"
+            },
+            "sqlPoolName": {
+              "type": "string",
+              "defaultValue": "defdedicated"
+            },
+            "performanceLevel": {
+              "type": "string",
+              "defaultValue": "DW1000c"
+            },
+            "capacity": {
+              "type": "int",
+              "defaultValue": 100
+            },
+            "sqlPoolTier": {
+              "type": "string",
+              "defaultValue": "Standard"
+            },
+            "sqlAdministratorLogin": {
+              "type": "string"
+            },
+            "mlsparkpoolName": {
+              "type": "string",
+              "defaultValue": "mlsparkpool"
+            },
+            "sqlAdministratorLoginPassword": {
+              "type": "securestring"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Synapse/workspaces",
+              "apiVersion": "2021-06-01",
+              "name": "[parameters('synapseWorkspaceName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "defaultDataLakeStorage": {
+                  "accountUrl": "[parameters('storageAccountUrl')]",
+                  "createManagedPrivateEndpoint": false,
+                  "filesystem": "[parameters('fileSystemName')]",
+                  "resourceId": "[parameters('storageResourceId')]"
+                },
+                "managedResourceGroupName": "[format('{0}-mrg', resourceGroup().name)]",
+                "sqlAdministratorLogin": "[parameters('sqlAdministratorLogin')]",
+                "sqlAdministratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]"
+              }
+            },
+            {
+              "type": "Microsoft.Synapse/workspaces/sqlPools",
+              "apiVersion": "2021-06-01",
+              "name": "[format('{0}/{1}', parameters('synapseWorkspaceName'), parameters('sqlPoolName'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "capacity": "[parameters('capacity')]",
+                "name": "[parameters('performanceLevel')]",
+                "tier": "[parameters('sqlPoolTier')]"
+              },
+              "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('synapseWorkspaceName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Synapse/workspaces/bigDataPools",
+              "apiVersion": "2021-06-01",
+              "name": "[format('{0}/{1}', parameters('synapseWorkspaceName'), parameters('mlsparkpoolName'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "nodeSize": "Medium",
+                "nodeSizeFamily": "HardwareAcceleratedGPU",
+                "nodeCount": 5,
+                "autoScale": {
+                  "enabled": true,
+                  "minNodeCount": 3,
+                  "maxNodeCount": 10
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('synapseWorkspaceName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "synapseWorkspaceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Synapse/workspaces', parameters('synapseWorkspaceName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id)))]"
+      ]
+    }
+  ]
+}
