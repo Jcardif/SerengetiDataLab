@@ -23,7 +23,7 @@
   },
   "variables": {
     "synapseWorkspaceName": "[format('SerengetiDataLab{0}', uniqueString(resourceGroup().id))]",
-    "storageAccountName": "[substring(format('serengetiStore{0}', uniqueString(resourceGroup().id)), 0, 24)]",
+    "storageAccountName": "[substring(format('serengetistore{0}', uniqueString(resourceGroup().id)), 0, 24)]",
     "fileSystemName": "synapsedef",
     "vaultName": "[format('serengetiVault{0}', uniqueString(resourceGroup().id))]",
     "amlWorkspaceName": "[format('SerengetiAML{0}', uniqueString(resourceGroup().id))]"
