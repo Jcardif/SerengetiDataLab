@@ -4,8 +4,13 @@ param storageAccountName string = 'serengetidatalake${uniqueString(resourceGroup
 param fileSystemName string = 'synapsedef'
 param vaultName string = 'serengetiVault${uniqueString(resourceGroup().id)}'
 
-module defaultSynapseDataLake 'datalake.bicep' ={
-  name : 'defaultSynapseDataLake${uniqueString(resourceGroup().id)}'
+param sqlAdministratorLogin string = 'sqladminuser'
+
+@secure()
+param sqlAdministratorLoginPassword string 
+
+module defaultSynapseDataLake 'datalake.bicep' = {
+  name: 'defaultSynapseDataLake${uniqueString(resourceGroup().id)}'
   params: {
     location: location
     storageAccountName: storageAccountName
@@ -18,52 +23,12 @@ module synapseWorkspace 'synapse.bicep' = {
     location: location
     synapseWorkspaceName: synapseWorkspaceName
     fileSystemName: fileSystemName
-    storageAccountUrl:defaultSynapseDataLake.outputs.accountUrl
+    storageAccountUrl: defaultSynapseDataLake.outputs.accountUrl
     storageResourceId: defaultSynapseDataLake.outputs.resourceId
+    sqlAdministratorLogin: sqlAdministratorLogin
+    sqlAdministratorLoginPassword: sqlAdministratorLoginPassword
   }
 }
-
-resource serengetiVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
-  name: vaultName
-  location: location
-  properties: {
-    accessPolicies: [
-      {
-        applicationId: 'string'
-        objectId: 'string'
-        permissions: {
-          certificates: [
-            'string'
-          ]
-          keys: [
-            'string'
-          ]
-          secrets: [
-            'string'
-          ]
-          storage: [
-            'string'
-          ]
-        }
-        tenantId: 'string'
-      }
-    ]
-
-    enableSoftDelete: true
-
-    provisioningState: 'string'
-    publicNetworkAccess: 'string'
-    sku: {
-      family: 'A'
-      name: 'string'
-    }
-    softDeleteRetentionInDays: 30
-    tenantId: 'string'
-    vaultUri: 'string'
-  }
-}
-
-
 
 
 
