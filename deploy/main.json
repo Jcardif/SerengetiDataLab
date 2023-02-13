@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "12276167591316441518"
+      "templateHash": "11235697184381852166"
     }
   },
   "parameters": {
@@ -23,7 +23,7 @@
   },
   "variables": {
     "synapseWorkspaceName": "[format('SerengetiDataLab{0}', uniqueString(resourceGroup().id))]",
-    "storageAccountName": "[format('serengetiStore{0}', uniqueString(resourceGroup().id))]",
+    "storageAccountName": "[substring(format('serengetiStore{0}', uniqueString(resourceGroup().id)), 0, 24)]",
     "fileSystemName": "synapsedef",
     "vaultName": "[format('serengetiVault{0}', uniqueString(resourceGroup().id))]",
     "amlWorkspaceName": "[format('SerengetiAML{0}', uniqueString(resourceGroup().id))]"
