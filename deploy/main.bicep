@@ -3,6 +3,7 @@ param synapseWorkspaceName string = 'SerengetiDataLab${uniqueString(resourceGrou
 param storageAccountName string = 'serengetidatalake${uniqueString(resourceGroup().id)}'
 param fileSystemName string = 'synapsedef'
 param vaultName string = 'serengetiVault${uniqueString(resourceGroup().id)}'
+param amlWorkspaceName string = 'SerengetiAML${uniqueString(resourceGroup().id)}'
 
 param sqlAdministratorLogin string = 'sqladminuser'
 
@@ -72,6 +73,15 @@ resource AccessKeySecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' 
   properties: {
     value: defaultSynapseDataLake.outputs.storageAccountKey
     contentType: 'text/plain'
+  }
+}
+
+resource serengetiAml 'Microsoft.MachineLearningServices/workspaces@2022-10-01' = {
+  name: amlWorkspaceName
+  location: location
+
+  properties:{
+    storageAccount: defaultSynapseDataLake.outputs.storageAccountName
   }
 }
 
