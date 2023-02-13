@@ -1,17 +1,8 @@
 param location string = resourceGroup().location
 param synapseWorkspaceName string 
-param storageAccountName string 
 param fileSystemName string 
-
-
-module defaultSynapseDataLake 'datalake.bicep' ={
-  name : 'defaultSynapseDataLake${uniqueString(resourceGroup().id)}'
-  params: {
-    location: location
-    storageAccountName: storageAccountName
-  }
-}
-
+param storageAccountUrl string
+param storageResourceId string
 
 resource synapseSerengeti 'Microsoft.Synapse/workspaces@2021-06-01' = {
   name: synapseWorkspaceName
@@ -19,10 +10,10 @@ resource synapseSerengeti 'Microsoft.Synapse/workspaces@2021-06-01' = {
 
   properties: {
     defaultDataLakeStorage: {
-      accountUrl: defaultSynapseDataLake.outputs.accountUrl
+      accountUrl: storageAccountUrl
       createManagedPrivateEndpoint: false
       filesystem: fileSystemName
-      resourceId: defaultSynapseDataLake.outputs.resourceId
+      resourceId: storageResourceId
     }
 
     managedResourceGroupName: '${resourceGroup().name}-mrg'

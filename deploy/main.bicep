@@ -2,15 +2,24 @@ param location string = resourceGroup().location
 param synapseWorkspaceName string = 'SerengetiDataLab${uniqueString(resourceGroup().id)}'
 param storageAccountName string = 'serengetidatalake${uniqueString(resourceGroup().id)}'
 param fileSystemName string = 'synapsedef'
-param vaultName = 'serengetiVault${uniqueString(resourceGroup().id)}'
+param vaultName string = 'serengetiVault${uniqueString(resourceGroup().id)}'
+
+module defaultSynapseDataLake 'datalake.bicep' ={
+  name : 'defaultSynapseDataLake${uniqueString(resourceGroup().id)}'
+  params: {
+    location: location
+    storageAccountName: storageAccountName
+  }
+}
 
 module synapseWorkspace 'synapse.bicep' = {
   name: 'synapseWorkspace'
   params: {
     location: location
     synapseWorkspaceName: synapseWorkspaceName
-    storageAccountName: storageAccountName
     fileSystemName: fileSystemName
+    storageAccountUrl:defaultSynapseDataLake.outputs.accountUrl
+    storageResourceId: defaultSynapseDataLake.outputs.resourceId
   }
 }
 
@@ -53,3 +62,8 @@ resource serengetiVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     vaultUri: 'string'
   }
 }
+
+
+
+
+
