@@ -6,6 +6,7 @@ var vaultName = 'serengetiVault${uniqueString(resourceGroup().id)}'
 var amlWorkspaceName = 'SerengetiAML${uniqueString(resourceGroup().id)}'
 var appInsightsName = 'serengetiAppInsights${uniqueString(resourceGroup().id)}'
 var logAnalyticsName = 'serengetiLogAnalytics${uniqueString(resourceGroup().id)}'
+var containerRegistryName = 'serengetiContainers${uniqueString(resourceGroup().id)}'
 
 
 param sqlAdministratorLogin string = 'sqladminuser'
@@ -78,6 +79,19 @@ resource AccessKeySecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' 
   properties: {
     value: defaultSynapseDataLake.outputs.storageAccountKey
     contentType: 'text/plain'
+  }
+}
+
+module amlWorkspace 'azureml.bicep' = {
+  name: 'amlWorkspace'
+  params: {
+    location: location
+    amlWorkspaceName: amlWorkspaceName
+    appInsightsName: appInsightsName
+    logAnalyticsName: logAnalyticsName
+    keyVaultId: SerengetiVault.id
+    storageId: defaultSynapseDataLake.outputs.resourceId
+    containerRegistryName: containerRegistryName
   }
 }
 

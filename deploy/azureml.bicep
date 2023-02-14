@@ -4,6 +4,7 @@ param location string
 param amlWorkspaceName string
 param storageId string
 param keyVaultId string
+param containerRegistryName string
 
 
 
@@ -28,6 +29,15 @@ resource serengetiAppInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
+//todo : swelection of sku
+resource serengetiContainerRegistry 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
+  name: containerRegistryName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+}
+
 resource serengetiAml 'Microsoft.MachineLearningServices/workspaces@2022-10-01' = {
   name: amlWorkspaceName
   location: location
@@ -36,5 +46,6 @@ resource serengetiAml 'Microsoft.MachineLearningServices/workspaces@2022-10-01' 
     storageAccount: storageId
     keyVault: keyVaultId
     applicationInsights: serengetiAppInsights.id
+    containerRegistry: serengetiContainerRegistry.id
   }
 }
