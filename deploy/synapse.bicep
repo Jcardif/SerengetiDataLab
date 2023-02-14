@@ -58,10 +58,14 @@ resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
   name: mlsparkpoolName
   parent: synapseSerengeti
   properties:{
-    sparkVersion: '2.4'
+    autoPause: {
+      delayInMinutes: 15
+      enabled: true
+    }
+    sparkVersion: '3.2'
     nodeSize: 'Medium'
     nodeSizeFamily: 'HardwareAcceleratedGPU'
-    nodeCount: 5
+    nodeCount: 3
     autoScale: {
       enabled: true
       minNodeCount: 3
@@ -74,3 +78,4 @@ resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
 
 // output resource id of the synapse workspace
 output synapseWorkspaceId string = synapseSerengeti.id
+output synapseManagedIdentityId string = synapseSerengeti.identity.principalId

@@ -2,7 +2,7 @@ param location string = resourceGroup().location
 var synapseWorkspaceName = substring('serengetidatalab${uniqueString(resourceGroup().id)}', 0, 24)
 var storageAccountName = substring('serengetistore${uniqueString(resourceGroup().id)}', 0, 24)
 var fileSystemName = 'synapsedef'
-var vaultName = 'serengetiVault${uniqueString(resourceGroup().id)}'
+var vaultName = substring('serengetikeyvault${uniqueString(resourceGroup().id)}', 0, 24)
 var amlWorkspaceName = 'SerengetiAML${uniqueString(resourceGroup().id)}'
 var appInsightsName = 'serengetiAppInsights${uniqueString(resourceGroup().id)}'
 var logAnalyticsName = 'serengetiLogAnalytics${uniqueString(resourceGroup().id)}'
@@ -49,7 +49,7 @@ resource SerengetiVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
     accessPolicies: [
       {
         tenantId: subscription().tenantId
-        objectId: synapseWorkspace.outputs.synapseWorkspaceId
+        objectId: synapseWorkspace.outputs.synapseManagedIdentityId
         permissions: {
           keys: [
             'get'
