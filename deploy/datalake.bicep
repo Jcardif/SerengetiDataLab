@@ -16,7 +16,7 @@ resource serengetiDataLake 'Microsoft.Storage/storageAccounts@2022-09-01'= {
 
 }
 
-  output accountUrl string = serengetiDataLake.properties.primaryEndpoints.blob
+  output accountUrl string = serengetiDataLake.properties.primaryEndpoints.dfs
   output resourceId string = serengetiDataLake.id
   output storageAccountName string = serengetiDataLake.name
 

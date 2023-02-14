@@ -58,6 +58,7 @@ resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
   name: mlsparkpoolName
   parent: synapseSerengeti
   properties:{
+    sparkVersion: '2.4'
     nodeSize: 'Medium'
     nodeSizeFamily: 'HardwareAcceleratedGPU'
     nodeCount: 5

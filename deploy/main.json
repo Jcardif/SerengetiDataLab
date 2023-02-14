@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "9336687082404239043"
+      "templateHash": "9171634690743611066"
     }
   },
   "parameters": {
@@ -113,7 +113,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "4296369179738125134"
+              "templateHash": "13153864912599617563"
             }
           },
           "parameters": {
@@ -144,7 +144,7 @@
           "outputs": {
             "accountUrl": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').primaryEndpoints.blob]"
+              "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').primaryEndpoints.dfs]"
             },
             "resourceId": {
               "type": "string",
@@ -201,7 +201,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "16220023745386066073"
+              "templateHash": "10051117858787275787"
             }
           },
           "parameters": {
@@ -292,6 +292,7 @@
               "name": "[format('{0}/{1}', parameters('synapseWorkspaceName'), parameters('mlsparkpoolName'))]",
               "location": "[parameters('location')]",
               "properties": {
+                "sparkVersion": "2.4",
                 "nodeSize": "Medium",
                 "nodeSizeFamily": "HardwareAcceleratedGPU",
                 "nodeCount": 5,
