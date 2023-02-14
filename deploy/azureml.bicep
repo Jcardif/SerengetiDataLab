@@ -41,7 +41,9 @@ resource serengetiContainerRegistry 'Microsoft.ContainerRegistry/registries@2022
 resource serengetiAml 'Microsoft.MachineLearningServices/workspaces@2022-10-01' = {
   name: amlWorkspaceName
   location: location
-
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties:{
     storageAccount: storageId
     keyVault: keyVaultId

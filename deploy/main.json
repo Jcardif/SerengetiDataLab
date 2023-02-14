@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "9395348385949760582"
+      "templateHash": "9223146387116301191"
     }
   },
   "parameters": {
@@ -366,7 +366,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "15846319839547601249"
+              "templateHash": "11755945478817401378"
             }
           },
           "parameters": {
@@ -432,6 +432,9 @@
               "apiVersion": "2022-10-01",
               "name": "[parameters('amlWorkspaceName')]",
               "location": "[parameters('location')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
               "properties": {
                 "storageAccount": "[parameters('storageId')]",
                 "keyVault": "[parameters('keyVaultId')]",
