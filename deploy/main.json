@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "14426738507098486189"
+      "templateHash": "3013055268231068331"
     }
   },
   "parameters": {
@@ -376,7 +376,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "12939682685248784515"
+              "templateHash": "12691211982297082316"
             }
           },
           "parameters": {
@@ -466,6 +466,7 @@
               "type": "Microsoft.MachineLearningServices/workspaces/linkedServices",
               "apiVersion": "2020-09-01-preview",
               "name": "[format('{0}/{1}', parameters('amlWorkspaceName'), 'synapseIntegration')]",
+              "location": "[parameters('location')]",
               "properties": {
                 "linkedServiceResourceId": "[parameters('synapseWorkspaceId')]",
                 "linkType": "Synapse"

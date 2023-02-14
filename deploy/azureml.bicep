@@ -54,6 +54,7 @@ resource serengetiAml 'Microsoft.MachineLearningServices/workspaces@2022-10-01' 
 
 resource synapseIntegration 'Microsoft.MachineLearningServices/workspaces/linkedServices@2020-09-01-preview' = {
   parent: serengetiAml
+  location: location
   name: 'synapseIntegration'
   properties: {
     linkedServiceResourceId: synapseWorkspaceId
