@@ -1,9 +1,11 @@
 param location string = resourceGroup().location
-var synapseWorkspaceName = 'SerengetiDataLab${uniqueString(resourceGroup().id)}'
+var synapseWorkspaceName = substring('serengetidatalab${uniqueString(resourceGroup().id)}', 0, 24)
 var storageAccountName = substring('serengetistore${uniqueString(resourceGroup().id)}', 0, 24)
 var fileSystemName = 'synapsedef'
 var vaultName = 'serengetiVault${uniqueString(resourceGroup().id)}'
 var amlWorkspaceName = 'SerengetiAML${uniqueString(resourceGroup().id)}'
+var appInsightsName = 'serengetiAppInsights${uniqueString(resourceGroup().id)}'
+var logAnalyticsName = 'serengetiLogAnalytics${uniqueString(resourceGroup().id)}'
 
 
 param sqlAdministratorLogin string = 'sqladminuser'
@@ -32,7 +34,9 @@ module synapseWorkspace 'synapse.bicep' = {
   }
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
+
+
+resource SerengetiVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
   name: vaultName
   location: location
   properties: {
@@ -62,7 +66,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
 
 // Create a secret
 resource passwordSecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' = {
-  name: '${keyVault.name}/SqlPoolPassword'
+  name: '${SerengetiVault.name}/SqlPoolPassword'
   properties: {
     value: sqlAdministratorLoginPassword
     contentType: 'text/plain'
@@ -70,21 +74,15 @@ resource passwordSecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' =
 }
 
 resource AccessKeySecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' = {
-  name: '${keyVault.name}/ADLS-AccessKey'
+  name: '${SerengetiVault.name}/ADLS-AccessKey'
   properties: {
     value: defaultSynapseDataLake.outputs.storageAccountKey
     contentType: 'text/plain'
   }
 }
 
-resource serengetiAml 'Microsoft.MachineLearningServices/workspaces@2022-10-01' = {
-  name: amlWorkspaceName
-  location: location
 
-  properties:{
-    storageAccount: defaultSynapseDataLake.outputs.resourceId
-  }
-}
+
 
 
 

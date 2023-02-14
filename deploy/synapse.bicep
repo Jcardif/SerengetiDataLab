@@ -32,6 +32,10 @@ resource synapseSerengeti 'Microsoft.Synapse/workspaces@2021-06-01' = {
     sqlAdministratorLoginPassword: sqlAdministratorLoginPassword
 
   }
+
+  identity: {
+    type: 'SystemAssigned'
+  }
 }
 
 resource dedicateSqlPool 'Microsoft.Synapse/workspaces/sqlPools@2021-06-01' = {
