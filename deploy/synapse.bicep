@@ -79,3 +79,4 @@ resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
 // output resource id of the synapse workspace
 output synapseWorkspaceId string = synapseSerengeti.id
 output synapseManagedIdentityId string = synapseSerengeti.identity.principalId
+output synapsePoolId  string = mlPool.id

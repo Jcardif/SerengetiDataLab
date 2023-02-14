@@ -92,6 +92,8 @@ module amlWorkspace 'azureml.bicep' = {
     keyVaultId: SerengetiVault.id
     storageId: defaultSynapseDataLake.outputs.resourceId
     containerRegistryName: containerRegistryName
+    synapseSparkPoolId: synapseWorkspace.outputs.synapsePoolId
+    synapseWorkspaceId: synapseWorkspace.outputs.synapseWorkspaceId
   }
 }
 

@@ -5,8 +5,8 @@ param amlWorkspaceName string
 param storageId string
 param keyVaultId string
 param containerRegistryName string
-
-
+param synapseWorkspaceId string
+param synapseSparkPoolId string
 
 resource serengetiLogWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: logAnalyticsName
@@ -51,3 +51,33 @@ resource serengetiAml 'Microsoft.MachineLearningServices/workspaces@2022-10-01' 
     containerRegistry: serengetiContainerRegistry.id
   }
 }
+
+resource synapseIntegration 'Microsoft.MachineLearningServices/workspaces/linkedServices@2020-09-01-preview' = {
+  parent: serengetiAml
+  name: 'synapseIntegration'
+  properties: {
+    linkedServiceResourceId: synapseWorkspaceId
+    linkType: 'Synapse'
+  }
+
+  identity: {
+    type: 'SystemAssigned'
+  }
+}
+
+
+resource synapseSparkPool 'Microsoft.MachineLearningServices/workspaces/computes@2022-12-01-preview' = {
+  name: 'amlSparkPool'
+  location: location
+
+  parent: serengetiAml
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    resourceId: synapseSparkPoolId
+    computeType: 'SynapseSpark'
+    workspaceName: serengetiAml.name
+  }
+}
+

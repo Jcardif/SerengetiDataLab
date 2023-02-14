@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "9223146387116301191"
+      "templateHash": "14426738507098486189"
     }
   },
   "parameters": {
@@ -201,7 +201,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "13192030080160232623"
+              "templateHash": "17652655550186217918"
             }
           },
           "parameters": {
@@ -319,6 +319,10 @@
             "synapseManagedIdentityId": {
               "type": "string",
               "value": "[reference(resourceId('Microsoft.Synapse/workspaces', parameters('synapseWorkspaceName')), '2021-06-01', 'full').identity.principalId]"
+            },
+            "synapsePoolId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Synapse/workspaces/bigDataPools', parameters('synapseWorkspaceName'), parameters('mlsparkpoolName'))]"
             }
           }
         }
@@ -357,6 +361,12 @@
           },
           "containerRegistryName": {
             "value": "[variables('containerRegistryName')]"
+          },
+          "synapseSparkPoolId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapsePoolId.value]"
+          },
+          "synapseWorkspaceId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceId.value]"
           }
         },
         "template": {
@@ -366,7 +376,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "11755945478817401378"
+              "templateHash": "12939682685248784515"
             }
           },
           "parameters": {
@@ -389,6 +399,12 @@
               "type": "string"
             },
             "containerRegistryName": {
+              "type": "string"
+            },
+            "synapseWorkspaceId": {
+              "type": "string"
+            },
+            "synapseSparkPoolId": {
               "type": "string"
             }
           },
@@ -445,13 +461,46 @@
                 "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]",
                 "[resourceId('Microsoft.ContainerRegistry/registries', parameters('containerRegistryName'))]"
               ]
+            },
+            {
+              "type": "Microsoft.MachineLearningServices/workspaces/linkedServices",
+              "apiVersion": "2020-09-01-preview",
+              "name": "[format('{0}/{1}', parameters('amlWorkspaceName'), 'synapseIntegration')]",
+              "properties": {
+                "linkedServiceResourceId": "[parameters('synapseWorkspaceId')]",
+                "linkType": "Synapse"
+              },
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('amlWorkspaceName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.MachineLearningServices/workspaces/computes",
+              "apiVersion": "2022-12-01-preview",
+              "name": "[format('{0}/{1}', parameters('amlWorkspaceName'), 'amlSparkPool')]",
+              "location": "[parameters('location')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "resourceId": "[parameters('synapseSparkPoolId')]",
+                "computeType": "SynapseSpark",
+                "workspaceName": "[parameters('amlWorkspaceName')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('amlWorkspaceName'))]"
+              ]
             }
           ]
         }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id)))]",
-        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]",
+        "[resourceId('Microsoft.Resources/deployments', 'synapseWorkspace')]"
       ]
     }
   ]
