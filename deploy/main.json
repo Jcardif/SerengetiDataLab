@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "17529180136715238389"
+      "templateHash": "9336687082404239043"
     }
   },
   "parameters": {
@@ -28,7 +28,8 @@
     "vaultName": "[format('serengetiVault{0}', uniqueString(resourceGroup().id))]",
     "amlWorkspaceName": "[format('SerengetiAML{0}', uniqueString(resourceGroup().id))]",
     "appInsightsName": "[format('serengetiAppInsights{0}', uniqueString(resourceGroup().id))]",
-    "logAnalyticsName": "[format('serengetiLogAnalytics{0}', uniqueString(resourceGroup().id))]"
+    "logAnalyticsName": "[format('serengetiLogAnalytics{0}', uniqueString(resourceGroup().id))]",
+    "containerRegistryName": "[format('serengetiContainers{0}', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
@@ -315,6 +316,130 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id)))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "amlWorkspace",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "amlWorkspaceName": {
+            "value": "[variables('amlWorkspaceName')]"
+          },
+          "appInsightsName": {
+            "value": "[variables('appInsightsName')]"
+          },
+          "logAnalyticsName": {
+            "value": "[variables('logAnalyticsName')]"
+          },
+          "keyVaultId": {
+            "value": "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]"
+          },
+          "storageId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.resourceId.value]"
+          },
+          "containerRegistryName": {
+            "value": "[variables('containerRegistryName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.14.46.61228",
+              "templateHash": "15846319839547601249"
+            }
+          },
+          "parameters": {
+            "logAnalyticsName": {
+              "type": "string"
+            },
+            "appInsightsName": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "amlWorkspaceName": {
+              "type": "string"
+            },
+            "storageId": {
+              "type": "string"
+            },
+            "keyVaultId": {
+              "type": "string"
+            },
+            "containerRegistryName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "[parameters('logAnalyticsName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "sku": {
+                  "name": "PerGB2018"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Insights/components",
+              "apiVersion": "2020-02-02",
+              "name": "[parameters('appInsightsName')]",
+              "location": "[parameters('location')]",
+              "kind": "web",
+              "properties": {
+                "Application_Type": "web",
+                "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.ContainerRegistry/registries",
+              "apiVersion": "2022-12-01",
+              "name": "[parameters('containerRegistryName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard"
+              }
+            },
+            {
+              "type": "Microsoft.MachineLearningServices/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "[parameters('amlWorkspaceName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "storageAccount": "[parameters('storageId')]",
+                "keyVault": "[parameters('keyVaultId')]",
+                "applicationInsights": "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]",
+                "containerRegistry": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('containerRegistryName'))]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]",
+                "[resourceId('Microsoft.ContainerRegistry/registries', parameters('containerRegistryName'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id)))]",
+        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]"
       ]
     }
   ]
