@@ -34,7 +34,10 @@ resource synapseSerengeti 'Microsoft.Synapse/workspaces@2021-06-01' = {
   }
 
   identity: {
-    type: 'SystemAssigned'
+    type: 'SystemAssigned,UserAssigned'
+    userAssignedIdentities: {
+      '${resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'synapse-managed-identity')}': {}
+    }
   }
 }
 

@@ -62,7 +62,10 @@ resource synapseIntegration 'Microsoft.MachineLearningServices/workspaces/linked
   }
 
   identity: {
-    type: 'SystemAssigned'
+    type: 'SystemAssigned,UserAssigned'
+    userAssignedIdentities: {
+      '${resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'synapse-managed-identity')}': {}
+    }
   }
 }
 
@@ -70,11 +73,15 @@ resource synapseIntegration 'Microsoft.MachineLearningServices/workspaces/linked
 resource synapseSparkPool 'Microsoft.MachineLearningServices/workspaces/computes@2022-12-01-preview' = {
   name: 'amlSparkPool'
   location: location
-
   parent: serengetiAml
+
   identity: {
-    type: 'SystemAssigned'
+    type: 'SystemAssigned,UserAssigned'
+    userAssignedIdentities: {
+      '${resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'synapse-managed-identity')}': {}
+    }
   }
+  
   properties: {
     resourceId: synapseSparkPoolId
     computeType: 'SynapseSpark'
