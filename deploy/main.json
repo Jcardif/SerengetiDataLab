@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "3013055268231068331"
+      "templateHash": "16008718861116610390"
     }
   },
   "parameters": {
@@ -201,7 +201,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "17652655550186217918"
+              "templateHash": "2200550764513966275"
             }
           },
           "parameters": {
@@ -268,6 +268,27 @@
               "identity": {
                 "type": "SystemAssigned"
               }
+            },
+            {
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "apiVersion": "2018-11-30",
+              "name": "deploymentScriptUAMI",
+              "location": "[parameters('location')]"
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-08-01-preview",
+              "scope": "[format('Microsoft.Synapse/workspaces/{0}', parameters('synapseWorkspaceName'))]",
+              "name": "[guid('cbe28037-09a6-4b35-a751-8dfd3f03f59d', subscription().subscriptionId, resourceGroup().id)]",
+              "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'deploymentScriptUAMI'), '2018-11-30').principalId]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('synapseWorkspaceName'))]",
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'deploymentScriptUAMI')]"
+              ]
             },
             {
               "type": "Microsoft.Synapse/workspaces/sqlPools",
