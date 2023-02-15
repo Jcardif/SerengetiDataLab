@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "16008718861116610390"
+      "templateHash": "7210506464608849048"
     }
   },
   "parameters": {
@@ -201,7 +201,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "2200550764513966275"
+              "templateHash": "11388679946213624467"
             }
           },
           "parameters": {
@@ -263,31 +263,25 @@
                 },
                 "managedResourceGroupName": "[format('{0}-mrg', resourceGroup().name)]",
                 "sqlAdministratorLogin": "[parameters('sqlAdministratorLogin')]",
-                "sqlAdministratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]"
+                "sqlAdministratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+                "cspWorkspaceAdminProperties": {
+                  "initialWorkspaceAdminObjectId": "f836fd9d-8a86-4710-b121-e0093c31bce2"
+                }
               },
               "identity": {
                 "type": "SystemAssigned"
               }
             },
             {
-              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-              "apiVersion": "2018-11-30",
-              "name": "deploymentScriptUAMI",
-              "location": "[parameters('location')]"
-            },
-            {
-              "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2020-08-01-preview",
-              "scope": "[format('Microsoft.Synapse/workspaces/{0}', parameters('synapseWorkspaceName'))]",
-              "name": "[guid('cbe28037-09a6-4b35-a751-8dfd3f03f59d', subscription().subscriptionId, resourceGroup().id)]",
+              "type": "Microsoft.Synapse/workspaces/firewallRules",
+              "apiVersion": "2021-06-01",
+              "name": "[format('{0}/{1}', parameters('synapseWorkspaceName'), 'allowAll')]",
               "properties": {
-                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
-                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'deploymentScriptUAMI'), '2018-11-30').principalId]",
-                "principalType": "ServicePrincipal"
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "255.255.255.255"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Synapse/workspaces', parameters('synapseWorkspaceName'))]",
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'deploymentScriptUAMI')]"
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('synapseWorkspaceName'))]"
               ]
             },
             {

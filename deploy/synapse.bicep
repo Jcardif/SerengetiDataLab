@@ -30,27 +30,23 @@ resource synapseSerengeti 'Microsoft.Synapse/workspaces@2021-06-01' = {
     sqlAdministratorLogin: sqlAdministratorLogin
     sqlAdministratorLoginPassword: sqlAdministratorLoginPassword
 
+    cspWorkspaceAdminProperties: {
+      initialWorkspaceAdminObjectId: ''
+    }
+
   }
+
   identity: {
     type: 'SystemAssigned'
   }
-
 }
 
-//User-Assignment Managed Identity used to execute deployment scripts
-resource uami 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
-  name: 'deploymentScriptUAMI'
-  location: location
-}
-
-//Assign Owner Role to UAMI in the Synapse Workspace. UAMI needs to be Owner so it can assign itself as Synapse Admin and create resources in the Data Plane.
-resource r_synapseWorkspaceOwner 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid('cbe28037-09a6-4b35-a751-8dfd3f03f59d', subscription().subscriptionId, resourceGroup().id)
-  scope: synapseSerengeti
+resource synapseFirewallAlowAll 'Microsoft.Synapse/workspaces/firewallRules@2021-06-01' = {
+  parent: synapseSerengeti
+  name: 'allowAll'
   properties: {
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
-    principalId: uami.properties.principalId
-    principalType: 'ServicePrincipal'
+    startIpAddress: '0.0.0.0'
+    endIpAddress: '255.255.255.255'
   }
 }
 
