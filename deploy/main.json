@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "16238284424161619048"
+      "templateHash": "6371119622977146744"
     }
   },
   "parameters": {
@@ -38,6 +38,7 @@
       "name": "[variables('vaultName')]",
       "location": "[parameters('location')]",
       "properties": {
+        "enableSoftDelete": false,
         "tenantId": "[subscription().tenantId]",
         "sku": {
           "name": "standard",
@@ -61,21 +62,6 @@
         "enabledForTemplateDeployment": true
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'synapseWorkspace')]"
-      ]
-    },
-    {
-      "type": "Microsoft.DataFactory/factories/linkedservices",
-      "apiVersion": "2018-06-01",
-      "name": "[format('{0}/keyVaultLinkedService', 'synapseWorkspace')]",
-      "properties": {
-        "type": "AzureKeyVault",
-        "typeProperties": {
-          "baseUrl": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('vaultName')), '2021-06-01-preview').vaultUri]"
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]",
         "[resourceId('Microsoft.Resources/deployments', 'synapseWorkspace')]"
       ]
     },
