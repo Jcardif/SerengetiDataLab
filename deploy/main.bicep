@@ -41,6 +41,7 @@ resource SerengetiVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
   name: vaultName
   location: location
   properties: {
+    enableSoftDelete: false
     tenantId: subscription().tenantId
     sku: {
       name: 'standard'
@@ -64,6 +65,17 @@ resource SerengetiVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
     enabledForTemplateDeployment: true
   }
 }
+
+resource serengetiVaultSynapseLink 'Microsoft.DataFactory/factories/linkedservices@2018-06-01' = {
+  name: '${synapseWorkspace.name}/keyVaultLinkedService'
+  properties:{
+    type: 'AzureKeyVault'
+    typeProperties:{
+      baseUrl: SerengetiVault.properties.vaultUri
+    }
+  }
+}
+
 
 // Create a secret
 resource passwordSecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' = {

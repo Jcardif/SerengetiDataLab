@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "7210506464608849048"
+      "templateHash": "16238284424161619048"
     }
   },
   "parameters": {
@@ -61,6 +61,21 @@
         "enabledForTemplateDeployment": true
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'synapseWorkspace')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DataFactory/factories/linkedservices",
+      "apiVersion": "2018-06-01",
+      "name": "[format('{0}/keyVaultLinkedService', 'synapseWorkspace')]",
+      "properties": {
+        "type": "AzureKeyVault",
+        "typeProperties": {
+          "baseUrl": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('vaultName')), '2021-06-01-preview').vaultUri]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]",
         "[resourceId('Microsoft.Resources/deployments', 'synapseWorkspace')]"
       ]
     },
@@ -201,7 +216,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "11388679946213624467"
+              "templateHash": "4924825940335374356"
             }
           },
           "parameters": {
@@ -263,10 +278,7 @@
                 },
                 "managedResourceGroupName": "[format('{0}-mrg', resourceGroup().name)]",
                 "sqlAdministratorLogin": "[parameters('sqlAdministratorLogin')]",
-                "sqlAdministratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
-                "cspWorkspaceAdminProperties": {
-                  "initialWorkspaceAdminObjectId": "f836fd9d-8a86-4710-b121-e0093c31bce2"
-                }
+                "sqlAdministratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]"
               },
               "identity": {
                 "type": "SystemAssigned"

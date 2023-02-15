@@ -25,15 +25,11 @@ resource synapseSerengeti 'Microsoft.Synapse/workspaces@2021-06-01' = {
       resourceId: storageResourceId
     }
 
+
     managedResourceGroupName: '${resourceGroup().name}-mrg'
 
     sqlAdministratorLogin: sqlAdministratorLogin
     sqlAdministratorLoginPassword: sqlAdministratorLoginPassword
-
-    cspWorkspaceAdminProperties: {
-      initialWorkspaceAdminObjectId: ''
-    }
-
   }
 
   identity: {
