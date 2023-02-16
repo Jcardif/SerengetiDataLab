@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "6371119622977146744"
+      "templateHash": "14438905864311675667"
     }
   },
   "parameters": {
@@ -67,7 +67,7 @@
     },
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
-      "apiVersion": "2021-06-01-preview",
+      "apiVersion": "2022-07-01",
       "name": "[format('{0}/SqlPoolPassword', variables('vaultName'))]",
       "properties": {
         "value": "[parameters('sqlAdministratorLoginPassword')]",
@@ -79,10 +79,36 @@
     },
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
-      "apiVersion": "2021-06-01-preview",
+      "apiVersion": "2022-07-01",
       "name": "[format('{0}/ADLS-AccessKey', variables('vaultName'))]",
       "properties": {
         "value": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.storageAccountKey.value]",
+        "contentType": "text/plain"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id)))]",
+        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2022-07-01",
+      "name": "[format('{0}/DedicatedPool-ConnectionString', variables('vaultName'))]",
+      "properties": {
+        "value": "[format('Server=tcp:{0}.sql.azuresynapse.net,1433;Initial Catalog={1};Persist Security Info=False;User ID={2};Password={3};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;', reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceName.value, reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseDedicatedSqlPoolName.value, parameters('sqlAdministratorLogin'), parameters('sqlAdministratorLoginPassword'))]",
+        "contentType": "text/plain"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]",
+        "[resourceId('Microsoft.Resources/deployments', 'synapseWorkspace')]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2022-07-01",
+      "name": "[format('{0}/ADLS-ConnectionString', variables('vaultName'))]",
+      "properties": {
+        "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net', reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.storageAccountName.value, reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.storageAccountKey.value)]",
         "contentType": "text/plain"
       },
       "dependsOn": [
@@ -202,7 +228,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "4924825940335374356"
+              "templateHash": "5081876673706425030"
             }
           },
           "parameters": {
@@ -310,7 +336,7 @@
                   "enabled": true
                 },
                 "sparkVersion": "3.2",
-                "nodeSize": "Medium",
+                "nodeSize": "XLarge",
                 "nodeSizeFamily": "HardwareAcceleratedGPU",
                 "nodeCount": 3,
                 "autoScale": {
@@ -336,6 +362,14 @@
             "synapsePoolId": {
               "type": "string",
               "value": "[resourceId('Microsoft.Synapse/workspaces/bigDataPools', parameters('synapseWorkspaceName'), parameters('mlsparkpoolName'))]"
+            },
+            "synapseWorkspaceName": {
+              "type": "string",
+              "value": "[parameters('synapseWorkspaceName')]"
+            },
+            "synapseDedicatedSqlPoolName": {
+              "type": "string",
+              "value": "[parameters('sqlPoolName')]"
             }
           }
         }
