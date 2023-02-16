@@ -1,0 +1,11 @@
+{
+	"name": "AzureKeyVaultLinkedService",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://serengetikeyvaultb37kfc5.vault.azure.net/"
+		}
+	}
+}
