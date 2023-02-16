@@ -71,7 +71,7 @@ resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
       enabled: true
     }
     sparkVersion: '3.2'
-    nodeSize: 'Medium'
+    nodeSize: 'XLarge'
     nodeSizeFamily: 'HardwareAcceleratedGPU'
     nodeCount: 3
     autoScale: {
