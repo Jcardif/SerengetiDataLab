@@ -353,3 +353,7 @@ MigrationBackup/
 # ignore syanpse linked services
 /linkedService
 /linkedService/*
+**/linkedService*/
+
+# ignore publishes from workspace
+**/serengetidatalab*/
