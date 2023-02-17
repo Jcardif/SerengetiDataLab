@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "14438905864311675667"
+      "templateHash": "14017637753244602346"
     }
   },
   "parameters": {
@@ -29,7 +29,8 @@
     "amlWorkspaceName": "[format('SerengetiAML{0}', uniqueString(resourceGroup().id))]",
     "appInsightsName": "[format('serengetiAppInsights{0}', uniqueString(resourceGroup().id))]",
     "logAnalyticsName": "[format('serengetiLogAnalytics{0}', uniqueString(resourceGroup().id))]",
-    "containerRegistryName": "[format('serengetiContainers{0}', uniqueString(resourceGroup().id))]"
+    "containerRegistryName": "[format('serengetiContainers{0}', uniqueString(resourceGroup().id))]",
+    "amlStorageName": "[format('amlStorage{0}', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
@@ -403,9 +404,6 @@
           "keyVaultId": {
             "value": "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]"
           },
-          "storageId": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id))), '2020-10-01').outputs.resourceId.value]"
-          },
           "containerRegistryName": {
             "value": "[variables('containerRegistryName')]"
           },
@@ -414,6 +412,9 @@
           },
           "synapseWorkspaceId": {
             "value": "[reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceId.value]"
+          },
+          "amlStorageName": {
+            "value": "[variables('amlStorageName')]"
           }
         },
         "template": {
@@ -423,7 +424,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.46.61228",
-              "templateHash": "12691211982297082316"
+              "templateHash": "7799845436052057116"
             }
           },
           "parameters": {
@@ -439,9 +440,6 @@
             "amlWorkspaceName": {
               "type": "string"
             },
-            "storageId": {
-              "type": "string"
-            },
             "keyVaultId": {
               "type": "string"
             },
@@ -452,6 +450,9 @@
               "type": "string"
             },
             "synapseSparkPoolId": {
+              "type": "string"
+            },
+            "amlStorageName": {
               "type": "string"
             }
           },
@@ -491,6 +492,21 @@
               }
             },
             {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('amlStorageName')]",
+              "location": "[parameters('location')]",
+              "kind": "StorageV2",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "properties": {
+                "accessTier": "Hot",
+                "supportsHttpsTrafficOnly": true,
+                "isHnsEnabled": false
+              }
+            },
+            {
               "type": "Microsoft.MachineLearningServices/workspaces",
               "apiVersion": "2022-10-01",
               "name": "[parameters('amlWorkspaceName')]",
@@ -499,12 +515,13 @@
                 "type": "SystemAssigned"
               },
               "properties": {
-                "storageAccount": "[parameters('storageId')]",
+                "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts', parameters('amlStorageName'))]",
                 "keyVault": "[parameters('keyVaultId')]",
                 "applicationInsights": "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]",
                 "containerRegistry": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('containerRegistryName'))]"
               },
               "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('amlStorageName'))]",
                 "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]",
                 "[resourceId('Microsoft.ContainerRegistry/registries', parameters('containerRegistryName'))]"
               ]
@@ -546,7 +563,6 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', format('defaultSynapseDataLake{0}', uniqueString(resourceGroup().id)))]",
         "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]",
         "[resourceId('Microsoft.Resources/deployments', 'synapseWorkspace')]"
       ]

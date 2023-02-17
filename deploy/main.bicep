@@ -7,6 +7,7 @@ var amlWorkspaceName = 'SerengetiAML${uniqueString(resourceGroup().id)}'
 var appInsightsName = 'serengetiAppInsights${uniqueString(resourceGroup().id)}'
 var logAnalyticsName = 'serengetiLogAnalytics${uniqueString(resourceGroup().id)}'
 var containerRegistryName = 'serengetiContainers${uniqueString(resourceGroup().id)}'
+var amlStorageName = 'amlStorage${uniqueString(resourceGroup().id)}'
 
 
 param sqlAdministratorLogin string = 'sqladminuser'
@@ -108,10 +109,10 @@ module amlWorkspace 'azureml.bicep' = {
     appInsightsName: appInsightsName
     logAnalyticsName: logAnalyticsName
     keyVaultId: SerengetiVault.id
-    storageId: defaultSynapseDataLake.outputs.resourceId
     containerRegistryName: containerRegistryName
     synapseSparkPoolId: synapseWorkspace.outputs.synapsePoolId
     synapseWorkspaceId: synapseWorkspace.outputs.synapseWorkspaceId
+    amlStorageName: amlStorageName
   }
 }
 
