@@ -2,7 +2,6 @@ param logAnalyticsName string
 param appInsightsName string
 param location string
 param amlWorkspaceName string
-param storageId string
 param keyVaultId string
 param containerRegistryName string
 param synapseWorkspaceId string
@@ -39,19 +38,7 @@ resource serengetiContainerRegistry 'Microsoft.ContainerRegistry/registries@2022
   }
 }
 
-resource serengetiAmlstorage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: amlStorageName
-  location: location
-  kind: 'StorageV2'
-  sku: {
-    name: 'Standard_LRS'
-  }
-  properties: {
-    accessTier: 'Hot'
-    supportsHttpsTrafficOnly: true
-    isHnsEnabled:false
-  }
-}
+
 
 resource serengetiAml 'Microsoft.MachineLearningServices/workspaces@2022-10-01' = {
   name: amlWorkspaceName
