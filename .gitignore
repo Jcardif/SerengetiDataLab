@@ -354,6 +354,8 @@ MigrationBackup/
 /linkedService
 /linkedService/*
 **/linkedService*/
+linkedService/
+**/linkedService/
 
 # ignore publishes from workspace
 **/serengetidatalab*/
