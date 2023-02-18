@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "13133220575611602923"
+      "templateHash": "18076266434067315422"
     }
   },
   "parameters": {
@@ -30,7 +30,7 @@
     "appInsightsName": "[format('serengetiAppInsights{0}', uniqueString(resourceGroup().id))]",
     "logAnalyticsName": "[format('serengetiLogAnalytics{0}', uniqueString(resourceGroup().id))]",
     "containerRegistryName": "[format('serengetiContainers{0}', uniqueString(resourceGroup().id))]",
-    "amlStorageName": "[substring(format('amlStorage{0}', uniqueString(resourceGroup().id)), 0, 24)]"
+    "amlStorageName": "[substring(format('amlstore{0}', uniqueString(resourceGroup().id)), 0, 20)]"
   },
   "resources": [
     {
