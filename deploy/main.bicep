@@ -7,7 +7,7 @@ var amlWorkspaceName = 'SerengetiAML${uniqueString(resourceGroup().id)}'
 var appInsightsName = 'serengetiAppInsights${uniqueString(resourceGroup().id)}'
 var logAnalyticsName = 'serengetiLogAnalytics${uniqueString(resourceGroup().id)}'
 var containerRegistryName = 'serengetiContainers${uniqueString(resourceGroup().id)}'
-var amlStorageName = substring('amlStorage${uniqueString(resourceGroup().id)}', 0, 24)
+var amlStorageName = substring('amlstore${uniqueString(resourceGroup().id)}', 0, 24)
 
 
 param sqlAdministratorLogin string = 'sqladminuser'
