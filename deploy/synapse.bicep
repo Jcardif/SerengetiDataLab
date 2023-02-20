@@ -71,7 +71,7 @@ resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
       enabled: true
     }
     sparkVersion: '3.2'
-    nodeSize: 'Medium'
+    nodeSize: 'XLarge'
     nodeSizeFamily: 'HardwareAcceleratedGPU'
     nodeCount: 3
     autoScale: {
@@ -86,3 +86,5 @@ resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
 output synapseWorkspaceId string = synapseSerengeti.id
 output synapseManagedIdentityId string = synapseSerengeti.identity.principalId
 output synapsePoolId string = mlPool.id
+output synapseWorkspaceName string = synapseSerengeti.name
+output synapseDedicatedSqlPoolName string = dedicateSqlPool.name

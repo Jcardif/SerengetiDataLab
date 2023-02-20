@@ -7,6 +7,7 @@ var amlWorkspaceName = 'SerengetiAML${uniqueString(resourceGroup().id)}'
 var appInsightsName = 'serengetiAppInsights${uniqueString(resourceGroup().id)}'
 var logAnalyticsName = 'serengetiLogAnalytics${uniqueString(resourceGroup().id)}'
 var containerRegistryName = 'serengetiContainers${uniqueString(resourceGroup().id)}'
+var amlStorageName = substring('amlstore${uniqueString(resourceGroup().id)}', 0, 20)
 
 
 param sqlAdministratorLogin string = 'sqladminuser'
@@ -67,7 +68,7 @@ resource SerengetiVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
 }
 
 // Create a secret
-resource passwordSecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' = {
+resource passwordSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   name: '${SerengetiVault.name}/SqlPoolPassword'
   properties: {
     value: sqlAdministratorLoginPassword
@@ -75,11 +76,27 @@ resource passwordSecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' =
   }
 }
 
-resource AccessKeySecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' = {
+resource AccessKeySecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   name: '${SerengetiVault.name}/ADLS-AccessKey'
   properties: {
     value: defaultSynapseDataLake.outputs.storageAccountKey
     contentType: 'text/plain'
+  }
+}
+
+resource dedicatedSqlPoolConnectionString 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+  name: '${SerengetiVault.name}/DedicatedPool-ConnectionString'
+  properties: {
+    value: 'Server=tcp:${synapseWorkspace.outputs.synapseWorkspaceName}.sql.azuresynapse.net,1433;Initial Catalog=${synapseWorkspace.outputs.synapseDedicatedSqlPoolName};Persist Security Info=False;User ID=${sqlAdministratorLogin};Password=${sqlAdministratorLoginPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;'
+    contentType: 'text/plain'
+  }
+}
+
+resource DataLakeConnectionString 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+  name: '${SerengetiVault.name}/ADLS-ConnectionString'
+  properties: {
+    value: 'DefaultEndpointsProtocol=https;AccountName=${defaultSynapseDataLake.outputs.storageAccountName};AccountKey=${defaultSynapseDataLake.outputs.storageAccountKey};EndpointSuffix=core.windows.net'
+    contentType: 'text/plain'   
   }
 }
 
@@ -92,10 +109,10 @@ module amlWorkspace 'azureml.bicep' = {
     appInsightsName: appInsightsName
     logAnalyticsName: logAnalyticsName
     keyVaultId: SerengetiVault.id
-    storageId: defaultSynapseDataLake.outputs.resourceId
     containerRegistryName: containerRegistryName
     synapseSparkPoolId: synapseWorkspace.outputs.synapsePoolId
     synapseWorkspaceId: synapseWorkspace.outputs.synapseWorkspaceId
+    amlStorageName: amlStorageName
   }
 }
 

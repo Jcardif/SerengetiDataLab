@@ -348,3 +348,15 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+
+# ignore syanpse linked services
+/linkedService
+/linkedService/*
+**/linkedService*/
+
+# ignore publishes from workspace
+**/serengetidatalab*/
+
+.DS_Store
+/.DS_Store
