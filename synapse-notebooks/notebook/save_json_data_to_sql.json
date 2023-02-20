@@ -4,20 +4,20 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "DefaultPool",
+			"referenceName": "UseThiosMlPool",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
-			"driverMemory": "112g",
-			"driverCores": 16,
-			"executorMemory": "112g",
-			"executorCores": 16,
-			"numExecutors": 9,
+			"driverMemory": "30g",
+			"driverCores": 4,
+			"executorMemory": "60g",
+			"executorCores": 12,
+			"numExecutors": 2,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
-				"spark.dynamicAllocation.minExecutors": "9",
-				"spark.dynamicAllocation.maxExecutors": "9",
-				"spark.autotune.trackingId": "74c0be80-c924-47f2-ad0e-7b5fd67478b5"
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "2f02b291-cecc-4dd6-b934-74b3f0ba2073"
 			}
 		},
 		"metadata": {
@@ -31,18 +31,18 @@
 				"name": "csharp"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/SerengetiDataLab/providers/Microsoft.Synapse/workspaces/serengetidatalab/bigDataPools/DefaultPool",
-				"name": "DefaultPool",
+				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/serengeti/providers/Microsoft.Synapse/workspaces/serengetidatalabb37kfc5h/bigDataPools/UseThiosMlPool",
+				"name": "UseThiosMlPool",
 				"type": "Spark",
-				"endpoint": "https://serengetidatalab.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/DefaultPool",
+				"endpoint": "https://serengetidatalabb37kfc5h.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/UseThiosMlPool",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
 				},
-				"sparkVersion": "3.3",
+				"sparkVersion": "3.2",
 				"nodeCount": 10,
 				"cores": 16,
-				"memory": 112,
+				"memory": 110,
 				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 120
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 62
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -84,7 +84,7 @@
 					"\n",
 					"using System.Collections.Concurrent;"
 				],
-				"execution_count": 63
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -228,7 +228,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 64
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -264,7 +264,7 @@
 					"    blobDirectory = blobContainer.GetDirectoryReference(\"metadata\");\n",
 					"}"
 				],
-				"execution_count": 65
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -303,7 +303,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 66
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +351,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 67
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -411,7 +411,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 68
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -454,7 +454,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 69
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -507,7 +507,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 70
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -535,7 +535,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 71
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -570,7 +570,7 @@
 					"    \"SnapshotSerengetiS11.json\"\n",
 					"};"
 				],
-				"execution_count": 72
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -616,7 +616,7 @@
 					"await Task.WhenAll(tasks);\n",
 					""
 				],
-				"execution_count": 73
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -638,7 +638,7 @@
 					"await InsertSplitImages(\"train\", splitData.splits.train.ToObject<List<string>>());\n",
 					"await InsertSplitImages(\"val\", splitData.splits.val.ToObject<List<string>>());"
 				],
-				"execution_count": 74
+				"execution_count": null
 			}
 		]
 	}

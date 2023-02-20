@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "dda88e1f-0d5e-4516-ac90-30950b16c54d"
+				"spark.autotune.trackingId": "4cf50a62-7857-483a-8dce-cdca56d91136"
 			}
 		},
 		"metadata": {
@@ -48,6 +48,60 @@
 			"sessionKeepAliveTimeout": 30
 		},
 		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"pip install keras"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"pip install keras-applications"
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"pip install tensorflow"
+				],
+				"execution_count": 11
+			},
 			{
 				"cell_type": "code",
 				"source": [
@@ -144,6 +198,54 @@
 					}
 				},
 				"source": [
+					"pip install keras --upgrade"
+				],
+				"execution_count": 17
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import numpy as np\r\n",
+					"import keras\r\n",
+					"from keras.applications import ResNet50\r\n",
+					"from keras.preprocessing.image import ImageDataGenerator\r\n",
+					"from keras.preprocessing import image\r\n",
+					"#from keras.applications.resnet50 import preprocess_input\r\n",
+					"from keras.models import Model\r\n",
+					"from keras.layers import Dense, GlobalAveragePooling2D\r\n",
+					"from keras.optimizers import Adam\r\n",
+					"import pandas as pd \r\n",
+					"from PIL import Image\r\n",
+					"import requests\r\n",
+					""
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
 					"import pandas as pd \r\n",
 					"df = df.toPandas()"
 				],
@@ -163,7 +265,296 @@
 					}
 				},
 				"source": [
+					"def imageURL(img_id):\r\n",
+					"    return f\"https://lilablobssc.blob.core.windows.net/snapshotserengeti-unzipped/{img_id}.JPG\"\r\n",
+					"\r\n",
+					"df_train[\"image_link\"] = df_train[\"image_id\"].apply(imageURL)\r\n",
+					"df_val[\"image_link\"] = df_val[\"image_id\"].apply(imageURL)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import multiprocessing as mp\r\n",
+					"\r\n",
+					"def load_image(url, queue):\r\n",
+					"    try:\r\n",
+					"        response = requests.get(url)\r\n",
+					"        img = Image.open(BytesIO(response.content))\r\n",
+					"        img = img.resize((224, 224), Image.ANTIALIAS)\r\n",
+					"        image = np.array(img)\r\n",
+					"        queue.put(image)\r\n",
+					"    except:\r\n",
+					"        queue.put(None)\r\n",
+					"        \r\n",
+					"def load_images(image_urls):\r\n",
+					"    manager = mp.Manager()\r\n",
+					"    queue = manager.Queue()\r\n",
+					"    processes = []\r\n",
+					"    \r\n",
+					"    for url in image_urls:\r\n",
+					"        process = mp.Process(target=load_image, args=(url, queue))\r\n",
+					"        process.start()\r\n",
+					"        processes.append(process)\r\n",
+					"        \r\n",
+					"    images = []\r\n",
+					"    success_count = 0\r\n",
+					"    failure_count = 0\r\n",
+					"    \r\n",
+					"    for _ in range(len(image_urls)):\r\n",
+					"        image = queue.get()\r\n",
+					"        if image is not None:\r\n",
+					"            images.append(image)\r\n",
+					"            success_count += 1\r\n",
+					"        else:\r\n",
+					"            failure_count += 1\r\n",
+					"            \r\n",
+					"    for process in processes:\r\n",
+					"        process.join()\r\n",
+					"        \r\n",
+					"    train_data = np.stack(images)\r\n",
+					"    \r\n",
+					"    print(\"Successful loads:\", success_count)\r\n",
+					"    print(\"Failed loads:\", failure_count)\r\n",
+					"    \r\n",
+					"    return train_data\r\n",
 					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"sub_set = df_train.iloc[:4][\"image_link\"]\r\n",
+					"sub_set"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"train_data = load_images(sub_set)\r\n",
+					"# val_data = load_images(df_val.iloc[0][\"image_link\"])\r\n",
+					"     "
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"labels_map = {\r\n",
+					"    'empty': 0,\r\n",
+					"    'human': 1,\r\n",
+					"    'gazellegrants': 2,\r\n",
+					"    'reedbuck': 3,\r\n",
+					"    'dikdik': 4,\r\n",
+					"    'zebra': 5,\r\n",
+					"    'porcupine': 6,\r\n",
+					"    'gazellethomsons': 7,\r\n",
+					"    'hyenaspotted': 8,\r\n",
+					"    'warthog': 9,\r\n",
+					"    'impala': 10,\r\n",
+					"    'elephant': 11,\r\n",
+					"    'aardvark': 12,\r\n",
+					"    'giraffe': 13,\r\n",
+					"    'mongoose': 14,\r\n",
+					"    'buffalo': 15,\r\n",
+					"    'hartebeest': 16,\r\n",
+					"    'guineafowl': 17,\r\n",
+					"    'wildebeest': 18,\r\n",
+					"    'leopard': 19,\r\n",
+					"    'ostrich': 20,\r\n",
+					"    'lionfemale': 21,\r\n",
+					"    'koribustard': 22,\r\n",
+					"    'otherbird': 23,\r\n",
+					"    'cheetah': 24,\r\n",
+					"    'honeybadger': 25,\r\n",
+					"    'bushbuck': 26,\r\n",
+					"    'jackal': 27,\r\n",
+					"    'aardwolf': 28,\r\n",
+					"    'hippopotamus': 29,\r\n",
+					"    'hyenastriped': 30,\r\n",
+					"    'hare': 31,\r\n",
+					"    'baboon': 32,\r\n",
+					"    'monkeyvervet': 33,\r\n",
+					"    'batearedfox': 34,\r\n",
+					"    'waterbuck': 35,\r\n",
+					"    'secretarybird': 36,\r\n",
+					"    'topi': 37,\r\n",
+					"    'serval': 38,\r\n",
+					"    'lionmale': 39,\r\n",
+					"    'eland': 40,\r\n",
+					"    'rodents': 41,\r\n",
+					"    'wildcat': 42,\r\n",
+					"    'civet': 43,\r\n",
+					"    'genet': 44,\r\n",
+					"    'zorilla': 45,\r\n",
+					"    'caracal': 46,\r\n",
+					"    'rhinoceros': 47,\r\n",
+					"    'reptiles': 48,\r\n",
+					"    'insectspider': 49,\r\n",
+					"    'duiker': 50,\r\n",
+					"    'cattle': 51,\r\n",
+					"    'vulture': 52,\r\n",
+					"    'steenbok': 53,\r\n",
+					"    'bat': 54,\r\n",
+					"    'fire': 55,\r\n",
+					"    'hyenabrown': 56,\r\n",
+					"    'wilddog': 57,\r\n",
+					"    'kudu': 58,\r\n",
+					"    'pangolin': 59,\r\n",
+					"    'lioncub': 60\r\n",
+					"}\r\n",
+					"\r\n",
+					"image_labels = ['empty', 'human', 'gazellegrants', 'reedbuck', 'dikdik', 'zebra', 'porcupine', 'gazellethomsons', 'hyenaspotted', 'warthog', 'impala', 'elephant', 'aardvark', 'giraffe', 'mongoose', 'buffalo', 'hartebeest', 'guineafowl', 'wildebeest', 'leopard', 'ostrich', 'lionfemale', 'koribustard', 'otherbird', 'cheetah', 'honeybadger', 'bushbuck', 'jackal', 'aardwolf', 'hippopotamus', 'hyenastriped', 'hare', 'baboon', 'monkeyvervet', 'batearedfox', 'waterbuck', 'secretarybird', 'topi', 'serval', 'lionmale', 'eland', 'rodents', 'wildcat', 'civet', 'genet', 'zorilla', 'caracal', 'rhinoceros', 'reptiles', 'insectspider', 'duiker', 'cattle', 'vulture', 'steenbok', 'bat', 'fire', 'hyenabrown', 'wilddog', 'kudu', 'pangolin', 'lioncub']\r\n",
+					"\r\n",
+					"\r\n",
+					"     "
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import numpy as np\r\n",
+					"\r\n",
+					"def one_hot_encode_labels(image_labels, labels_map):\r\n",
+					"    # Convert the label names to integers using the labels_map dictionary\r\n",
+					"    label_ints = [labels_map[label] for label in image_labels]\r\n",
+					"    # Perform one-hot encoding using np.eye\r\n",
+					"    train_labels = np.eye(len(labels_map))[label_ints]\r\n",
+					"    return train_labels\r\n",
+					"\r\n",
+					"train_labels = one_hot_encode_labels(image_labels, labels_map)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import keras\r\n",
+					"from keras.applications import ResNet50\r\n",
+					"from keras.preprocessing import image\r\n",
+					"from keras.layers import Dense, GlobalAveragePooling2D\r\n",
+					"from keras.optimizers import SGD\r\n",
+					"from keras.models import Model\r\n",
+					"from keras.preprocessing.image import ImageDataGenerator\r\n",
+					"\r\n",
+					"num_classes = 59\r\n",
+					"# Load the ResNet50 model pre-trained on ImageNet\r\n",
+					"resnet_model = ResNet50(weights='imagenet', include_top=False, input_shape=(224,224,3))\r\n",
+					"\r\n",
+					"# Freeze all layers of the pre-trained model\r\n",
+					"for layer in resnet_model.layers:\r\n",
+					"    layer.trainable = False\r\n",
+					"\r\n",
+					"# Add new trainable layers on top of the frozen layers\r\n",
+					"x = resnet_model.output\r\n",
+					"x = GlobalAveragePooling2D()(x)\r\n",
+					"x = Dense(1024, activation='relu')(x)\r\n",
+					"x = Dense(512, activation='relu')(x)\r\n",
+					"predictions = Dense(num_classes, activation='softmax')(x)\r\n",
+					"\r\n",
+					"# Compile the model\r\n",
+					"model = Model(inputs=resnet_model.input, outputs=predictions)\r\n",
+					"model.compile(optimizer=SGD(lr=0.001, momentum=0.9), loss='categorical_crossentropy', metrics=['accuracy'])\r\n",
+					"\r\n",
+					"# Create ImageDataGenerator objects for the training and validation sets\r\n",
+					"train_datagen = ImageDataGenerator(rescale=1./255)\r\n",
+					"val_datagen = ImageDataGenerator(rescale=1./255)\r\n",
+					"            \r\n",
+					"            \r\n",
+					"# Use the flow_from_dataframe method to load the data\r\n",
+					"train_generator = train_datagen.flow_from_dataframe(\r\n",
+					"    dataframe=df,\r\n",
+					"    x_col='image_link',\r\n",
+					"    y_col='name',\r\n",
+					"    directory=None,\r\n",
+					"    target_size=(224,224),\r\n",
+					"    batch_size=32,\r\n",
+					"    class_mode='categorical')\r\n",
+					"\r\n",
+					"val_generator = val_datagen.flow_from_dataframe(\r\n",
+					"    dataframe=df_val,\r\n",
+					"    x_col='image_link',\r\n",
+					"    y_col='name',\r\n",
+					"    directory=None,\r\n",
+					"    target_size=(224,224),\r\n",
+					"    batch_size=32,\r\n",
+					"    class_mode='categorical')\r\n",
+					"\r\n",
+					"# Compile the model\r\n",
+					"model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])\r\n",
+					"\r\n",
+					"# Train the model\r\n",
+					"model.fit(train_generator, epochs=10, steps_per_epoch=100)"
 				],
 				"execution_count": null
 			}
