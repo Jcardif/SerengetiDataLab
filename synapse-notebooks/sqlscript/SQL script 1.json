@@ -1,8 +1,8 @@
 {
-	"name": "drop_tables",
+	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "DROP TABLE val\nDROP TABLE train\nDROP TABLE images\nDROP TABLE categories\nDROP TABLE annotations\n",
+			"query": "SELECT * FROM annotations\n",
 			"metadata": {
 				"language": "sql"
 			},
