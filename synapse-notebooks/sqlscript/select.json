@@ -1,5 +1,5 @@
 {
-	"name": "SQL script 1",
+	"name": "select",
 	"properties": {
 		"content": {
 			"query": "SELECT * FROM annotations\n",

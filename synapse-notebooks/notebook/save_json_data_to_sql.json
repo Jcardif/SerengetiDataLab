@@ -4,7 +4,7 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "UseThiosMlPool",
+			"referenceName": "amlpool",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c3e51b67-6013-4a7b-b91b-7d964572f3ff"
+				"spark.autotune.trackingId": "18fd1b2c-813d-4171-a5bc-62f504279b7a"
 			}
 		},
 		"metadata": {
@@ -31,10 +31,10 @@
 				"name": "csharp"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/serengeti/providers/Microsoft.Synapse/workspaces/serengetidatalabb37kfc5h/bigDataPools/UseThiosMlPool",
-				"name": "UseThiosMlPool",
+				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/serengeti/providers/Microsoft.Synapse/workspaces/serengetidatalabb37kfc5h/bigDataPools/amlpool",
+				"name": "amlpool",
 				"type": "Spark",
-				"endpoint": "https://serengetidatalabb37kfc5h.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/UseThiosMlPool",
+				"endpoint": "https://serengetidatalabb37kfc5h.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/amlpool",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 1
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -84,7 +84,7 @@
 					"\n",
 					"using System.Collections.Concurrent;"
 				],
-				"execution_count": null
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -228,7 +228,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -248,11 +248,11 @@
 					"CloudBlobDirectory blobDirectory;\n",
 					"//int batchSize = 500;\n",
 					"\n",
-					"var accountKey = Credentials.GetSecret(\"VaultSerengeti\",\"ADLS-AccessKey\");\n",
-					"string storageConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";\n",
+					"var accountKey = Credentials.GetSecret(\"serengetikeyvaultb37kfc5\",\"ADLS-AccessKey\");\n",
+					"string storageConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengetistoreb37kfc5hmy;AccountKey={accountKey};EndpointSuffix=core.windows.net\";\n",
 					"\n",
-					"var password = Credentials.GetSecret(\"VaultSerengeti\",\"SqlPoolPassword\");\n",
-					"var dbConnectionString = $\"Server=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=dedicateddef;Persist Security Info=False;User ID=sqladminuser;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;\";\n",
+					"var password = Credentials.GetSecret(\"serengetikeyvaultb37kfc5\",\"SqlPoolPassword\");\n",
+					"var dbConnectionString = $\"Server=tcp:serengetidatalabb37kfc5h.sql.azuresynapse.net,1433;Initial Catalog=defdedicated;Persist Security Info=False;User ID=sqladminuser;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;\";\n",
 					"\n",
 					"private void InitStorageAndDb()\n",
 					"{\n",
@@ -264,7 +264,7 @@
 					"    blobDirectory = blobContainer.GetDirectoryReference(\"metadata\");\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -303,7 +303,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +351,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -411,7 +411,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
@@ -454,7 +454,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -507,7 +507,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -536,7 +536,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
@@ -571,7 +571,7 @@
 					"    \"SnapshotSerengetiS11.json\"\n",
 					"};"
 				],
-				"execution_count": null
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -617,7 +617,7 @@
 					"await Task.WhenAll(tasks);\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
