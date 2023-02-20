@@ -3,17 +3,21 @@
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "UseThiosMlPool",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
-			"driverMemory": "28g",
+			"driverMemory": "30g",
 			"driverCores": 4,
-			"executorMemory": "28g",
-			"executorCores": 4,
+			"executorMemory": "60g",
+			"executorCores": 12,
 			"numExecutors": 2,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "879236c1-2e21-4f7c-a5a9-3412e77c858f"
+				"spark.autotune.trackingId": "dda88e1f-0d5e-4516-ac90-30950b16c54d"
 			}
 		},
 		"metadata": {
@@ -21,10 +25,25 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/serengeti/providers/Microsoft.Synapse/workspaces/serengetidatalabb37kfc5h/bigDataPools/UseThiosMlPool",
+				"name": "UseThiosMlPool",
+				"type": "Spark",
+				"endpoint": "https://serengetidatalabb37kfc5h.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/UseThiosMlPool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 16,
+				"memory": 110,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -39,7 +58,7 @@
 					"    .appName(\"Create Spark Dataframe\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -57,12 +76,12 @@
 				"source": [
 					"spark.conf.set(\"\", \"\")\r\n",
 					"\r\n",
-					"Database = \"dedicateddef\"\r\n",
-					"Server = \"serengetidatalab.sql.azuresynapse.net\"\r\n",
-					"User = \"user@serengetidatalab\"\r\n",
+					"Database = \"defdedicated\"\r\n",
+					"Server = \"serengetidatalabb37kfc5h.sql.azuresynapse.net\"\r\n",
+					"User = \"sqladminuser@serengetidatalabb37kfc5h\"\r\n",
 					"# Pass = sqladmin00!\r\n",
 					"JdbcPort =  \"1433\"\r\n",
-					"Pass = \"\"\r\n",
+					"Pass = \"5R&SC4phRemt$d6S\"\r\n",
 					"JdbcExtraOptions = \"encrypt=true;trustServerCertificate=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;\"\r\n",
 					"\r\n",
 					"sqlUrl = f\"jdbc:sqlserver://{Server}:{JdbcPort};database={Database};user={User};password={Pass};${JdbcExtraOptions}\"\r\n",
@@ -79,9 +98,9 @@
 					"  .option(\"dbTable\", tableName) \\\r\n",
 					"  .load()\r\n",
 					"\r\n",
-					"# df.show()"
+					"df.show()"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -109,7 +128,7 @@
 					"\r\n",
 					"df_val.show()"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -128,7 +147,7 @@
 					"import pandas as pd \r\n",
 					"df = df.toPandas()"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
