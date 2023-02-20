@@ -4,7 +4,7 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "UseThiosMlPool",
+			"referenceName": "amlpool",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2f02b291-cecc-4dd6-b934-74b3f0ba2073"
+				"spark.autotune.trackingId": "176d90fa-69b3-4fce-b729-8b8647392cc0"
 			}
 		},
 		"metadata": {
@@ -31,10 +31,10 @@
 				"name": "csharp"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/serengeti/providers/Microsoft.Synapse/workspaces/serengetidatalabb37kfc5h/bigDataPools/UseThiosMlPool",
-				"name": "UseThiosMlPool",
+				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/serengeti/providers/Microsoft.Synapse/workspaces/serengetidatalabb37kfc5h/bigDataPools/amlpool",
+				"name": "amlpool",
 				"type": "Spark",
-				"endpoint": "https://serengetidatalabb37kfc5h.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/UseThiosMlPool",
+				"endpoint": "https://serengetidatalabb37kfc5h.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/amlpool",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
@@ -57,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 1
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -84,7 +84,7 @@
 					"\n",
 					"using System.Collections.Concurrent;"
 				],
-				"execution_count": null
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -228,7 +228,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
@@ -248,11 +248,11 @@
 					"CloudBlobDirectory blobDirectory;\n",
 					"//int batchSize = 500;\n",
 					"\n",
-					"var accountKey = Credentials.GetSecret(\"VaultSerengeti\",\"ADLS-AccessKey\");\n",
-					"string storageConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengeti;AccountKey={accountKey};EndpointSuffix=core.windows.net\";\n",
+					"var accountKey = Credentials.GetSecret(\"serengetikeyvaultb37kfc5\",\"ADLS-AccessKey\");\n",
+					"string storageConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengetistoreb37kfc5hmy;AccountKey={accountKey};EndpointSuffix=core.windows.net\";\n",
 					"\n",
-					"var password = Credentials.GetSecret(\"VaultSerengeti\",\"SqlPoolPassword\");\n",
-					"var dbConnectionString = $\"Server=tcp:serengetidatalab.sql.azuresynapse.net,1433;Initial Catalog=dedicateddef;Persist Security Info=False;User ID=sqladminuser;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;\";\n",
+					"var password = Credentials.GetSecret(\"serengetikeyvaultb37kfc5\",\"SqlPoolPassword\");\n",
+					"var dbConnectionString = $\"Server=tcp:serengetidatalabb37kfc5h.sql.azuresynapse.net,1433;Initial Catalog=defdedicated;Persist Security Info=False;User ID=sqladminuser;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;\";\n",
 					"\n",
 					"private void InitStorageAndDb()\n",
 					"{\n",
@@ -264,7 +264,7 @@
 					"    blobDirectory = blobContainer.GetDirectoryReference(\"metadata\");\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 38
 			},
 			{
 				"cell_type": "code",
@@ -303,7 +303,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
@@ -326,8 +326,8 @@
 					"        {\"images\", \"CREATE TABLE images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\"},\n",
 					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(255));\"},\n",
 					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(255) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"},\n",
-					"        {\"train\", \"CREATE TABLE train ( image_id VARCHAR(255));\"},\n",
-					"        {\"val\", \"CREATE TABLE val ( image_id VARCHAR(255));\"}\n",
+					"        {\"train\", \"CREATE TABLE train ( image_id VARCHAR(255), category_id INT);\"},\n",
+					"        {\"val\", \"CREATE TABLE val ( image_id VARCHAR(255), category_id INT);\"}\n",
 					"    };\n",
 					"\n",
 					"    using(var conn = new SqlConnection(dbConnectionString))\n",
@@ -351,7 +351,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -411,7 +411,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -454,7 +454,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
@@ -507,7 +507,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -528,14 +528,16 @@
 					"    using(var conn = new SqlConnection(dbConnectionString))\n",
 					"    {\n",
 					"        await conn.OpenAsync();\n",
-					"        using (SqlCommand command = new SqlCommand($\"INSERT INTO {table} (image_id) SELECT image_id FROM annotations WHERE location IN ({string.Join(\",\", locations.Select(x => $\"'{x}'\"))})\", conn))\n",
+					"        using (SqlCommand command = new SqlCommand($\"INSERT INTO {table} (image_id, category_id) SELECT image_id, category_id FROM annotations WHERE location IN ({string.Join(\",\", locations.Select(x => $\"'{x}'\"))}) AND category_id > 1\", conn)\n",
+					", conn)\n",
+					")\n",
 					"        {\n",
 					"            command.ExecuteNonQuery();\n",
 					"        }\n",
 					"    }\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -570,7 +572,7 @@
 					"    \"SnapshotSerengetiS11.json\"\n",
 					"};"
 				],
-				"execution_count": null
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -616,7 +618,7 @@
 					"await Task.WhenAll(tasks);\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -638,7 +640,7 @@
 					"await InsertSplitImages(\"train\", splitData.splits.train.ToObject<List<string>>());\n",
 					"await InsertSplitImages(\"val\", splitData.splits.val.ToObject<List<string>>());"
 				],
-				"execution_count": null
+				"execution_count": 47
 			}
 		]
 	}
