@@ -17,15 +17,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "176d90fa-69b3-4fce-b729-8b8647392cc0"
+				"spark.autotune.trackingId": "7fca0bf1-abfa-4a8e-8f9e-6fcac6838345"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_pyspark",
-				"display_name": "Synapse PySpark"
+				"name": "synapse_sparkdotnet",
+				"display_name": "csharp"
 			},
 			"language_info": {
 				"name": "csharp"
@@ -33,17 +33,10 @@
 			"a365ComputeOptions": {
 				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/serengeti/providers/Microsoft.Synapse/workspaces/serengetidatalabb37kfc5h/bigDataPools/amlpool",
 				"name": "amlpool",
-				"type": "Spark",
-				"endpoint": "https://serengetidatalabb37kfc5h.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/amlpool",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
-				},
-				"sparkVersion": "3.2",
-				"nodeCount": 10,
-				"cores": 16,
-				"memory": 110,
-				"automaticScaleJobs": false
+				}
 			},
 			"sessionKeepAliveTimeout": 120
 		},
@@ -246,13 +239,11 @@
 				"source": [
 					"CloudBlobContainer blobContainer;\n",
 					"CloudBlobDirectory blobDirectory;\n",
-					"//int batchSize = 500;\n",
 					"\n",
-					"var accountKey = Credentials.GetSecret(\"serengetikeyvaultb37kfc5\",\"ADLS-AccessKey\");\n",
-					"string storageConnectionString = $\"DefaultEndpointsProtocol=https;AccountName=serengetistoreb37kfc5hmy;AccountKey={accountKey};EndpointSuffix=core.windows.net\";\n",
+					"var vaultName = \"\";\n",
 					"\n",
-					"var password = Credentials.GetSecret(\"serengetikeyvaultb37kfc5\",\"SqlPoolPassword\");\n",
-					"var dbConnectionString = $\"Server=tcp:serengetidatalabb37kfc5h.sql.azuresynapse.net,1433;Initial Catalog=defdedicated;Persist Security Info=False;User ID=sqladminuser;Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;\";\n",
+					"string storageConnectionString = Credentials.GetSecret(vaultName,\"ADLS-ConnectionString\");\n",
+					"var dbConnectionString = Credentials.GetSecret(vaultName,\"DedicatedPool-ConnectionString\");\n",
 					"\n",
 					"private void InitStorageAndDb()\n",
 					"{\n",
