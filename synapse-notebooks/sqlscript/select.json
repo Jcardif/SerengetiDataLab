@@ -2,7 +2,7 @@
 	"name": "select",
 	"properties": {
 		"content": {
-			"query": "SELECT * FROM annotations\n",
+			"query": "SELECT * FROM train\n",
 			"metadata": {
 				"language": "sql"
 			},
