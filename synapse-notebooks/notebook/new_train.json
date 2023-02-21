@@ -1,0 +1,240 @@
+{
+	"name": "new_train",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "amlpool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "1396f03e-00e1-4eb9-8430-030071cf3e00"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/serengeti/providers/Microsoft.Synapse/workspaces/serengetidatalabb37kfc5h/bigDataPools/amlpool",
+				"name": "amlpool",
+				"type": "Spark",
+				"endpoint": "https://serengetidatalabb37kfc5h.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/amlpool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 16,
+				"memory": 110,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"pip install keras"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"pip install keras-applications"
+				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import numpy as np\r\n",
+					"import keras\r\n",
+					"# from keras.applications import ResNet50\r\n",
+					"from keras.preprocessing.image import ImageDataGenerator\r\n",
+					"from keras.preprocessing import image\r\n",
+					"#from keras.applications.resnet50 import preprocess_input\r\n",
+					"from keras.models import Model\r\n",
+					"from keras.layers import Dense, GlobalAveragePooling2D\r\n",
+					"# from keras.optimizers import Adam\r\n",
+					"import pandas as pd \r\n",
+					"from PIL import Image\r\n",
+					"import requests\r\n",
+					""
+				],
+				"execution_count": 20
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql import SparkSession\r\n",
+					"\r\n",
+					"spark = SparkSession \\\r\n",
+					"    .builder \\\r\n",
+					"    .appName(\"Create Spark Dataframe\") \\\r\n",
+					"    .getOrCreate()"
+				],
+				"execution_count": 27
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"\r\n",
+					"spark.conf.set(\"\", \"\")\r\n",
+					"\r\n",
+					"Database = \"dedicateddef\"\r\n",
+					"Server = \"serengetidatalab.sql.azuresynapse.net\"\r\n",
+					"User = \"user@serengetidatalab\"\r\n",
+					"# Pass = sqladmin00!\r\n",
+					"JdbcPort =  \"1433\"\r\n",
+					"Pass = \"5R&SC4phRemt$d6S\"\r\n",
+					"JdbcExtraOptions = \"encrypt=true;trustServerCertificate=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;\"\r\n",
+					"\r\n",
+					"sqlUrl = f\"jdbc:sqlserver://{Server}:{JdbcPort};database={Database};user={User};password={Pass};${JdbcExtraOptions}\"\r\n",
+					"\r\n",
+					"tableName = \"train\"\r\n",
+					"\r\n",
+					"tempDir = \"abfss://snapshot-serengeti@serengeti.dfs.core.windows.net/\"\r\n",
+					"\r\n",
+					"df = spark.read \\\r\n",
+					"  .format(\"jdbc\") \\\r\n",
+					"  .option(\"url\", sqlUrl) \\\r\n",
+					"  .option(\"tempDir\", tempDir) \\\r\n",
+					"  .option(\"forwardSparkAzureStorageCredentials\", \"true\") \\\r\n",
+					"  .option(\"dbTable\", tableName) \\\r\n",
+					"  .load()\r\n",
+					"\r\n",
+					"# df.show()"
+				],
+				"execution_count": 28
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"tableName2 = \"val\"\r\n",
+					"\r\n",
+					"df_val = spark.read \\\r\n",
+					"  .format(\"jdbc\") \\\r\n",
+					"  .option(\"url\", sqlUrl) \\\r\n",
+					"  .option(\"tempDir\", tempDir) \\\r\n",
+					"  .option(\"forwardSparkAzureStorageCredentials\", \"true\") \\\r\n",
+					"  .option(\"dbTable\", tableName2) \\\r\n",
+					"  .load()\r\n",
+					"\r\n",
+					"df_val.show()"
+				],
+				"execution_count": 25
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import pandas as pd \r\n",
+					"df_train = df.toPandas()\r\n",
+					"df_val = df_val.toPandas()"
+				],
+				"execution_count": 23
+			}
+		]
+	}
+}
