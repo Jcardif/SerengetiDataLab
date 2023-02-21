@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f3882c95-64b8-4732-9026-e24880d51aab"
+				"spark.autotune.trackingId": "58d9a159-e32c-40e9-bc56-89d5087f92c4"
 			}
 		},
 		"metadata": {
@@ -62,9 +62,9 @@
 					}
 				},
 				"source": [
-					"pip install keras"
+					"pip install keras --upgrade"
 				],
-				"execution_count": 55
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -82,19 +82,7 @@
 				"source": [
 					"pip install keras-applications"
 				],
-				"execution_count": 56
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"from pyspark.sql import SparkSession\r\n",
-					"\r\n",
-					"spark = SparkSession \\\r\n",
-					"    .builder \\\r\n",
-					"    .appName(\"Create Spark Dataframe\") \\\r\n",
-					"    .getOrCreate()"
-				],
-				"execution_count": 57
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -110,17 +98,40 @@
 					}
 				},
 				"source": [
-					"spark.conf.set(\"\", \"\")\r\n",
+					"pip install --upgrade tensorflow==2.9"
+				],
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import SparkSession\r\n",
 					"\r\n",
-					"Database = \"defdedicated\"\r\n",
-					"Server = \"serengetidatalabb37kfc5h.sql.azuresynapse.net\"\r\n",
-					"User = \"sqladminuser@serengetidatalabb37kfc5h\"\r\n",
-					"# Pass = sqladmin00!\r\n",
-					"JdbcPort =  \"1433\"\r\n",
-					"Pass = \"5R&SC4phRemt$d6S\"\r\n",
-					"JdbcExtraOptions = \"encrypt=true;trustServerCertificate=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;\"\r\n",
+					"spark = SparkSession \\\r\n",
+					"    .builder \\\r\n",
+					"    .appName(\"Create Spark Dataframe\") \\\r\n",
+					"    .getOrCreate()"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"password = TokenLibrary.getSecret('serengetikeyvaultb37kfc5', 'SqlPoolPassword')\r\n",
+					"user = TokenLibrary.getSecret('serengetikeyvaultb37kfc5', 'SqlDbUser')\r\n",
 					"\r\n",
-					"sqlUrl = f\"jdbc:sqlserver://{Server}:{JdbcPort};database={Database};user={User};password={Pass};${JdbcExtraOptions}\"\r\n",
+					"sqlUrl = f\"jdbc:sqlserver://serengetidatalabb37kfc5h.sql.azuresynapse.net:1433;database=defdedicated;user={user};password={password};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.sql.azuresynapse.net;loginTimeout=30;\"\r\n",
 					"\r\n",
 					"tableName = \"train\"\r\n",
 					"\r\n",
@@ -136,7 +147,7 @@
 					"\r\n",
 					"df.show()"
 				],
-				"execution_count": 58
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -164,25 +175,7 @@
 					"\r\n",
 					"df_val.show()"
 				],
-				"execution_count": 59
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"pip install keras --upgrade"
-				],
-				"execution_count": 60
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -203,7 +196,7 @@
 					"df_val = df_val.toPandas()\r\n",
 					""
 				],
-				"execution_count": 61
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -225,7 +218,7 @@
 					"df_train[\"image_link\"] = df_train[\"image_id\"].apply(imageURL)\r\n",
 					"df_val[\"image_link\"] = df_val[\"image_id\"].apply(imageURL)"
 				],
-				"execution_count": 62
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -253,26 +246,7 @@
 					"# Show the image using img.show()\r\n",
 					"img.show()"
 				],
-				"execution_count": 63
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"train_sub_set = df_train.iloc[:50][\"image_link\"]\r\n",
-					"val_sub_set =  df_val.iloc[:50][\"image_link\"]"
-				],
-				"execution_count": 70
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -289,6 +263,7 @@
 				},
 				"source": [
 					"import multiprocessing as mp\r\n",
+					"import numpy as np\r\n",
 					"\r\n",
 					"def load_image(url, queue):\r\n",
 					"    try:\r\n",
@@ -333,7 +308,7 @@
 					"    return train_data\r\n",
 					""
 				],
-				"execution_count": 65
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -349,18 +324,37 @@
 					}
 				},
 				"source": [
-					"import multiprocessing as mp\r\n",
-					"\r\n",
-					"def load_image_try(url):\r\n",
-					"    response = requests.get(url)\r\n",
-					"    img = Image.open(requests.get(url, stream=True).raw)\r\n",
-					"    img = img.resize((224, 224), Image.ANTIALIAS)\r\n",
-					"    image = np.array(img)\r\n",
-					"\r\n",
-					"df_train[\"image\"] = df_train[\"image_link\"].apply(load_image_try)\r\n",
-					"df_train"
+					"train_sub_set = df_train.iloc[:50][\"image_link\"]\r\n",
+					"val_sub_set =  df_val.iloc[:50][\"image_link\"]"
 				],
-				"execution_count": 69
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# import multiprocessing as mp\r\n",
+					"\r\n",
+					"# def load_image_try(url):\r\n",
+					"#     response = requests.get(url)\r\n",
+					"#     img = Image.open(requests.get(url, stream=True).raw)\r\n",
+					"#     img = img.resize((224, 224), Image.ANTIALIAS)\r\n",
+					"#     image = np.array(img)\r\n",
+					"\r\n",
+					"# df_train[\"image\"] = df_train[\"image_link\"].apply(load_image_try)\r\n",
+					"# df_train"
+				],
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -445,7 +439,7 @@
 					"\r\n",
 					"     "
 				],
-				"execution_count": 67
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -465,7 +459,7 @@
 					"val_data = load_images(val_sub_set)\r\n",
 					"     "
 				],
-				"execution_count": 68
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -492,43 +486,7 @@
 					"\r\n",
 					"train_labels = one_hot_encode_labels(image_labels, labels_map)"
 				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"train_labels"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"pip install --upgrade tensorflow==2.9"
-				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -546,7 +504,27 @@
 				"source": [
 					"df_train"
 				],
-				"execution_count": null
+				"execution_count": 16
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"train_labels\r\n",
+					"train_category = df_train[\"category_id\"].apply(one_hot_encode_labels)\r\n",
+					"val_category = df_val[\"category_id\"].apply(one_hot_encode_labels)"
+				],
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -579,7 +557,7 @@
 					"        return batch_x, batch_y\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -631,9 +609,9 @@
 					"            \r\n",
 					"            \r\n",
 					"# Use the flow_from_dataframe method to load the data\r\n",
-					"train_generator = ArrayDataGenerator(train_data, train_labels, 32)\r\n",
+					"train_generator = ArrayDataGenerator(train_data, train_category, 32)\r\n",
 					"\r\n",
-					"val_generator = ArrayDataGenerator(val_data, val_labels, 32)\r\n",
+					"val_generator = ArrayDataGenerator(val_data, val_category, 32)\r\n",
 					"\r\n",
 					"# Compile the model\r\n",
 					"model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])\r\n",
@@ -641,7 +619,7 @@
 					"# Train the model\r\n",
 					"model.fit(train_generator, epochs=10, steps_per_epoch=100)"
 				],
-				"execution_count": null
+				"execution_count": 20
 			}
 		]
 	}
