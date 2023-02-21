@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "58d9a159-e32c-40e9-bc56-89d5087f92c4"
+				"spark.autotune.trackingId": "c2cfebbc-5653-4c59-8cf1-1559fb702f0c"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 				"source": [
 					"pip install keras --upgrade"
 				],
-				"execution_count": 6
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -100,7 +100,7 @@
 				"source": [
 					"pip install --upgrade tensorflow==2.9"
 				],
-				"execution_count": 18
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -112,7 +112,7 @@
 					"    .appName(\"Create Spark Dataframe\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 3
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -147,7 +147,7 @@
 					"\r\n",
 					"df.show()"
 				],
-				"execution_count": 4
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -175,7 +175,7 @@
 					"\r\n",
 					"df_val.show()"
 				],
-				"execution_count": 5
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -308,7 +308,7 @@
 					"    return train_data\r\n",
 					""
 				],
-				"execution_count": 11
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -327,7 +327,7 @@
 					"train_sub_set = df_train.iloc[:50][\"image_link\"]\r\n",
 					"val_sub_set =  df_val.iloc[:50][\"image_link\"]"
 				],
-				"execution_count": 10
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -459,7 +459,7 @@
 					"val_data = load_images(val_sub_set)\r\n",
 					"     "
 				],
-				"execution_count": 22
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -524,7 +524,7 @@
 					"train_category = df_train[\"category_id\"].apply(one_hot_encode_labels)\r\n",
 					"val_category = df_val[\"category_id\"].apply(one_hot_encode_labels)"
 				],
-				"execution_count": 21
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -557,7 +557,7 @@
 					"        return batch_x, batch_y\r\n",
 					""
 				],
-				"execution_count": 19
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -619,7 +619,7 @@
 					"# Train the model\r\n",
 					"model.fit(train_generator, epochs=10, steps_per_epoch=100)"
 				],
-				"execution_count": 20
+				"execution_count": null
 			}
 		]
 	}
