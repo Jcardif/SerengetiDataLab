@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fac9f7ae-4a78-4d04-868f-429dced44a14"
+				"spark.autotune.trackingId": "f3882c95-64b8-4732-9026-e24880d51aab"
 			}
 		},
 		"metadata": {
@@ -269,10 +269,10 @@
 					}
 				},
 				"source": [
-					"train_sub_set = df_train[\"image_link\"]\r\n",
-					"val_sub_set =  df_val[\"image_link\"]"
+					"train_sub_set = df_train.iloc[:50][\"image_link\"]\r\n",
+					"val_sub_set =  df_val.iloc[:50][\"image_link\"]"
 				],
-				"execution_count": 64
+				"execution_count": 70
 			},
 			{
 				"cell_type": "code",
@@ -294,7 +294,7 @@
 					"    try:\r\n",
 					"        response = requests.get(url)\r\n",
 					"        img = Image.open(requests.get(url, stream=True).raw)\r\n",
-					"        img = img.resize((224, 224), Image.ANTIALIAS)\r\n",
+					"        img = img.resize((224, 224), Image.LANCZOS)\r\n",
 					"        image = np.array(img)\r\n",
 					"        queue.put(image)\r\n",
 					"    except:\r\n",
@@ -360,7 +360,7 @@
 					"df_train[\"image\"] = df_train[\"image_link\"].apply(load_image_try)\r\n",
 					"df_train"
 				],
-				"execution_count": 66
+				"execution_count": 69
 			},
 			{
 				"cell_type": "code",
