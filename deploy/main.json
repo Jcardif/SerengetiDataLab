@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.14.46.61228",
-      "templateHash": "13644834998387524099"
+      "version": "0.14.85.62628",
+      "templateHash": "14153730401910366452"
     }
   },
   "parameters": {
@@ -153,8 +153,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.46.61228",
-              "templateHash": "13153864912599617563"
+              "version": "0.14.85.62628",
+              "templateHash": "15163770309300291503"
             }
           },
           "parameters": {
@@ -241,8 +241,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.46.61228",
-              "templateHash": "5081876673706425030"
+              "version": "0.14.85.62628",
+              "templateHash": "777487775948984144"
             }
           },
           "parameters": {
@@ -281,9 +281,9 @@
             "sqlAdministratorLogin": {
               "type": "string"
             },
-            "mlsparkpoolName": {
+            "defsparkpoolName": {
               "type": "string",
-              "defaultValue": "mlsparkpool"
+              "defaultValue": "defsparkpool"
             },
             "sqlAdministratorLoginPassword": {
               "type": "securestring"
@@ -342,7 +342,7 @@
             {
               "type": "Microsoft.Synapse/workspaces/bigDataPools",
               "apiVersion": "2021-06-01",
-              "name": "[format('{0}/{1}', parameters('synapseWorkspaceName'), parameters('mlsparkpoolName'))]",
+              "name": "[format('{0}/{1}', parameters('synapseWorkspaceName'), parameters('defsparkpoolName'))]",
               "location": "[parameters('location')]",
               "properties": {
                 "autoPause": {
@@ -351,7 +351,7 @@
                 },
                 "sparkVersion": "3.2",
                 "nodeSize": "XLarge",
-                "nodeSizeFamily": "HardwareAcceleratedGPU",
+                "nodeSizeFamily": "MemoryOptimized",
                 "nodeCount": 3,
                 "autoScale": {
                   "enabled": true,
@@ -375,7 +375,7 @@
             },
             "synapsePoolId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.Synapse/workspaces/bigDataPools', parameters('synapseWorkspaceName'), parameters('mlsparkpoolName'))]"
+              "value": "[resourceId('Microsoft.Synapse/workspaces/bigDataPools', parameters('synapseWorkspaceName'), parameters('defsparkpoolName'))]"
             },
             "synapseWorkspaceName": {
               "type": "string",
@@ -436,8 +436,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.46.61228",
-              "templateHash": "7799845436052057116"
+              "version": "0.14.85.62628",
+              "templateHash": "17201431371071132047"
             }
           },
           "parameters": {
