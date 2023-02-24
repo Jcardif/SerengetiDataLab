@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.46.61228",
-      "templateHash": "18076266434067315422"
+      "templateHash": "13644834998387524099"
     }
   },
   "parameters": {
@@ -97,6 +97,19 @@
       "name": "[format('{0}/DedicatedPool-ConnectionString', variables('vaultName'))]",
       "properties": {
         "value": "[format('Server=tcp:{0}.sql.azuresynapse.net,1433;Initial Catalog={1};Persist Security Info=False;User ID={2};Password={3};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;', reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceName.value, reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseDedicatedSqlPoolName.value, parameters('sqlAdministratorLogin'), parameters('sqlAdministratorLoginPassword'))]",
+        "contentType": "text/plain"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]",
+        "[resourceId('Microsoft.Resources/deployments', 'synapseWorkspace')]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2022-07-01",
+      "name": "[format('{0}/DedicatedPool-odbc-ConnectionString', variables('vaultName'))]",
+      "properties": {
+        "value": "[format('Driver={{ODBC Driver 13 for SQL Server}};Server=tcp:{0}.sql.azuresynapse.net,1433;Database={1};Uid={2};Pwd={3};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;', reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceName.value, reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseDedicatedSqlPoolName.value, parameters('sqlAdministratorLogin'), parameters('sqlAdministratorLoginPassword'))]",
         "contentType": "text/plain"
       },
       "dependsOn": [
