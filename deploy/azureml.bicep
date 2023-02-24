@@ -83,7 +83,7 @@ resource synapseIntegration 'Microsoft.MachineLearningServices/workspaces/linked
 
 
 resource synapseSparkPool 'Microsoft.MachineLearningServices/workspaces/computes@2022-12-01-preview' = {
-  name: 'amlSparkPool'
+  name: 'synapsedefpool'
   location: location
   parent: serengetiAml
 
