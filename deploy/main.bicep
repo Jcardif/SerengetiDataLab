@@ -9,11 +9,10 @@ var logAnalyticsName = 'serengetiLogAnalytics${uniqueString(resourceGroup().id)}
 var containerRegistryName = 'serengetiContainers${uniqueString(resourceGroup().id)}'
 var amlStorageName = substring('amlstore${uniqueString(resourceGroup().id)}', 0, 20)
 
-
 param sqlAdministratorLogin string = 'sqladminuser'
 
 @secure()
-param sqlAdministratorLoginPassword string 
+param sqlAdministratorLoginPassword string
 
 module defaultSynapseDataLake 'datalake.bicep' = {
   name: 'defaultSynapseDataLake${uniqueString(resourceGroup().id)}'
@@ -35,8 +34,6 @@ module synapseWorkspace 'synapse.bicep' = {
     sqlAdministratorLoginPassword: sqlAdministratorLoginPassword
   }
 }
-
-
 
 resource SerengetiVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
   name: vaultName
@@ -92,14 +89,21 @@ resource dedicatedSqlPoolConnectionString 'Microsoft.KeyVault/vaults/secrets@202
   }
 }
 
+resource dedicatedSqlPoolODBCConnectionString 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+  name: '${SerengetiVault.name}/DedicatedPool-odbc-ConnectionString'
+  properties: {
+    value: 'Driver={ODBC Driver 13 for SQL Server};Server=tcp:${synapseWorkspace.outputs.synapseWorkspaceName}.sql.azuresynapse.net,1433;Database=${synapseWorkspace.outputs.synapseDedicatedSqlPoolName};Uid=${sqlAdministratorLogin};Pwd=${sqlAdministratorLoginPassword};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+    contentType: 'text/plain'
+  }
+}
+
 resource DataLakeConnectionString 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   name: '${SerengetiVault.name}/ADLS-ConnectionString'
   properties: {
     value: 'DefaultEndpointsProtocol=https;AccountName=${defaultSynapseDataLake.outputs.storageAccountName};AccountKey=${defaultSynapseDataLake.outputs.storageAccountKey};EndpointSuffix=core.windows.net'
-    contentType: 'text/plain'   
+    contentType: 'text/plain'
   }
 }
-
 
 module amlWorkspace 'azureml.bicep' = {
   name: 'amlWorkspace'
@@ -115,10 +119,3 @@ module amlWorkspace 'azureml.bicep' = {
     amlStorageName: amlStorageName
   }
 }
-
-
-
-
-
-
-
