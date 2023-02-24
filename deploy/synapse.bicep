@@ -8,7 +8,7 @@ param performanceLevel string = 'DW1000c'
 param capacity int = 100
 param sqlPoolTier string = 'Standard'
 param sqlAdministratorLogin string
-param mlsparkpoolName string = 'mlsparkpool'
+param defsparkpoolName string = 'defsparkpool'
 
 @secure()
 param sqlAdministratorLoginPassword string
@@ -61,9 +61,9 @@ resource dedicateSqlPool 'Microsoft.Synapse/workspaces/sqlPools@2021-06-01' = {
   }
 }
 
-resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
+resource defSparkPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
   location: location
-  name: mlsparkpoolName
+  name: defsparkpoolName
   parent: synapseSerengeti
   properties: {
     autoPause: {
@@ -72,7 +72,7 @@ resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
     }
     sparkVersion: '3.2'
     nodeSize: 'XLarge'
-    nodeSizeFamily: 'HardwareAcceleratedGPU'
+    nodeSizeFamily: 'MemoryOptimized'
     nodeCount: 3
     autoScale: {
       enabled: true
@@ -85,6 +85,6 @@ resource mlPool 'Microsoft.Synapse/workspaces/bigDataPools@2021-06-01' = {
 // output resource id of the synapse workspace
 output synapseWorkspaceId string = synapseSerengeti.id
 output synapseManagedIdentityId string = synapseSerengeti.identity.principalId
-output synapsePoolId string = mlPool.id
+output synapsePoolId string = defSparkPool.id
 output synapseWorkspaceName string = synapseSerengeti.name
 output synapseDedicatedSqlPoolName string = dedicateSqlPool.name
