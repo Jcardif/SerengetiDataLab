@@ -92,7 +92,7 @@ resource dedicatedSqlPoolConnectionString 'Microsoft.KeyVault/vaults/secrets@202
 resource dedicatedSqlPoolODBCConnectionString 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   name: '${SerengetiVault.name}/DedicatedPool-odbc-ConnectionString'
   properties: {
-    value: 'Driver={ODBC Driver 13 for SQL Server};Server=tcp:${synapseWorkspace.outputs.synapseWorkspaceName}.sql.azuresynapse.net,1433;Database=${synapseWorkspace.outputs.synapseDedicatedSqlPoolName};Uid=${sqlAdministratorLogin};Pwd=${sqlAdministratorLoginPassword};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+    value: 'Driver={ODBC Driver 17 for SQL Server};Server=tcp:${synapseWorkspace.outputs.synapseWorkspaceName}.sql.azuresynapse.net,1433;Database=${synapseWorkspace.outputs.synapseDedicatedSqlPoolName};Uid=${sqlAdministratorLogin};Pwd=${sqlAdministratorLoginPassword};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
     contentType: 'text/plain'
   }
 }

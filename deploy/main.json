@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.85.62628",
-      "templateHash": "14153730401910366452"
+      "templateHash": "2845610480191597995"
     }
   },
   "parameters": {
@@ -109,7 +109,7 @@
       "apiVersion": "2022-07-01",
       "name": "[format('{0}/DedicatedPool-odbc-ConnectionString', variables('vaultName'))]",
       "properties": {
-        "value": "[format('Driver={{ODBC Driver 13 for SQL Server}};Server=tcp:{0}.sql.azuresynapse.net,1433;Database={1};Uid={2};Pwd={3};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;', reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceName.value, reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseDedicatedSqlPoolName.value, parameters('sqlAdministratorLogin'), parameters('sqlAdministratorLoginPassword'))]",
+        "value": "[format('Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{0}.sql.azuresynapse.net,1433;Database={1};Uid={2};Pwd={3};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;', reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceName.value, reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseDedicatedSqlPoolName.value, parameters('sqlAdministratorLogin'), parameters('sqlAdministratorLoginPassword'))]",
         "contentType": "text/plain"
       },
       "dependsOn": [
@@ -437,7 +437,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.85.62628",
-              "templateHash": "17201431371071132047"
+              "templateHash": "2879954568413092855"
             }
           },
           "parameters": {
@@ -558,7 +558,7 @@
             {
               "type": "Microsoft.MachineLearningServices/workspaces/computes",
               "apiVersion": "2022-12-01-preview",
-              "name": "[format('{0}/{1}', parameters('amlWorkspaceName'), 'amlSparkPool')]",
+              "name": "[format('{0}/{1}', parameters('amlWorkspaceName'), 'synapsedefpool')]",
               "location": "[parameters('location')]",
               "identity": {
                 "type": "SystemAssigned"
