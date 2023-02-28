@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9e4e9dee-b739-4d4e-b99b-724be2fffef5"
+				"spark.autotune.trackingId": "61713283-4667-48e0-8f42-44a596fdf60e"
 			}
 		},
 		"metadata": {
@@ -69,11 +69,55 @@
 					"token_library = sc._jvm.com.microsoft.azure.synapse.tokenlibrary.TokenLibrary\n",
 					"\n",
 					"vault_name = 'serengetikeyvaultqezfaqk'\n",
-					"vault_linked_service_name  = 'VaultSerengeti'\n",
 					"\n",
 					"pool_connection_string = mssparkutils.credentials.getSecret(vault_name, 'DedicatedPool-Jdbc-ConnectionString')"
 				],
-				"execution_count": 9
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"tableName = \"train\"\n",
+					"\n",
+					"df_train = spark.read \\\n",
+					"  .format(\"jdbc\") \\\n",
+					"  .option(\"url\", pool_connection_string) \\\n",
+					"  .option(\"forwardSparkAzureStorageCredentials\", \"true\") \\\n",
+					"  .option(\"dbTable\", tableName) \\\n",
+					"  .load()\n",
+					"\n",
+					"df_train.show()"
+				],
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_train"
+				],
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
