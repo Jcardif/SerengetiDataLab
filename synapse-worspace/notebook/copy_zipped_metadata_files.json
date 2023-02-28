@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "da2169d3-8d61-4496-9000-3592ad50abb9"
+				"spark.autotune.trackingId": "5b1d34e4-f7bb-4610-9502-af6e2b8c2f05"
 			}
 		},
 		"metadata": {
@@ -67,7 +67,7 @@
 					"#r \"nuget: Microsoft.Azure.Storage.Blob\"\n",
 					"#r \"nuget: Microsoft.Azure.Storage.File\""
 				],
-				"execution_count": 1
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -94,7 +94,7 @@
 					"using Microsoft.Azure.Storage.Auth;\n",
 					"using Microsoft.Spark.Extensions.Azure.Synapse.Analytics.Notebook.MSSparkUtils;"
 				],
-				"execution_count": 2
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -113,11 +113,11 @@
 					"CloudBlobContainer destContainer, sourceContainer;\n",
 					"CloudBlobDirectory destDirectory;\n",
 					"\n",
-					"var vaultName = \"\";\n",
+					"var vaultName = \"serengetikeyvaultqezfaqk\";\n",
 					"\n",
 					"string destConnectionString = Credentials.GetSecret(vaultName,\"ADLS-ConnectionString\");"
 				],
-				"execution_count": 3
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -155,7 +155,7 @@
 					"    destDirectory = destContainer.GetDirectoryReference(\"metadata\");\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -196,7 +196,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -239,7 +239,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -294,7 +294,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
