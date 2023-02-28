@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7635f95c-1924-42d9-9284-f5c3ee0ab00e"
+				"spark.autotune.trackingId": "9e4e9dee-b739-4d4e-b99b-724be2fffef5"
 			}
 		},
 		"metadata": {
@@ -62,9 +62,18 @@
 					}
 				},
 				"source": [
-					""
+					"import sys\n",
+					"from pyspark.sql import SparkSession\n",
+					"\n",
+					"sc = SparkSession.builder.getOrCreate()\n",
+					"token_library = sc._jvm.com.microsoft.azure.synapse.tokenlibrary.TokenLibrary\n",
+					"\n",
+					"vault_name = 'serengetikeyvaultqezfaqk'\n",
+					"vault_linked_service_name  = 'VaultSerengeti'\n",
+					"\n",
+					"pool_connection_string = mssparkutils.credentials.getSecret(vault_name, 'DedicatedPool-Jdbc-ConnectionString')"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -80,18 +89,9 @@
 					}
 				},
 				"source": [
-					"import sys\n",
-					"from pyspark.sql import SparkSession\n",
-					"\n",
-					"sc = SparkSession.builder.getOrCreate()\n",
-					"token_library = sc._jvm.com.microsoft.azure.synapse.tokenlibrary.TokenLibrary\n",
-					"\n",
-					"vault_name = 'VaultSerengeti'\n",
-					"\n",
-					"connection_string = token_library.GetSecret(vault_name, DedicatedPool-Jdbc-ConnectionString)\n",
-					"print(connection_string)"
+					""
 				],
-				"execution_count": 9
+				"execution_count": null
 			}
 		]
 	}
