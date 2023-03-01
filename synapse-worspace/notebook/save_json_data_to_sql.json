@@ -4,39 +4,46 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "amlpool",
+			"referenceName": "defsparkpool",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
-			"driverMemory": "30g",
-			"driverCores": 4,
-			"executorMemory": "60g",
-			"executorCores": 12,
+			"driverMemory": "224g",
+			"driverCores": 32,
+			"executorMemory": "224g",
+			"executorCores": 32,
 			"numExecutors": 2,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7fca0bf1-abfa-4a8e-8f9e-6fcac6838345"
+				"spark.autotune.trackingId": "c215d259-bdac-4f91-b813-aa52332fe137"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_sparkdotnet",
-				"display_name": "csharp"
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "csharp"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/serengeti/providers/Microsoft.Synapse/workspaces/serengetidatalabb37kfc5h/bigDataPools/amlpool",
-				"name": "amlpool",
+				"id": "/subscriptions/a1a27566-3e3c-42d7-a372-692095cd8521/resourceGroups/SerengetiDataLab/providers/Microsoft.Synapse/workspaces/serengetidatalabqezfaqkj/bigDataPools/defsparkpool",
+				"name": "defsparkpool",
+				"type": "Spark",
+				"endpoint": "https://serengetidatalabqezfaqkj.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/defsparkpool",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
-				}
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 3,
+				"cores": 32,
+				"memory": 224,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 120
 		},
@@ -50,7 +57,7 @@
 					"#r \"nuget: Newtonsoft.Json\"\n",
 					"#r \"nuget: System.Data.SqlClient\""
 				],
-				"execution_count": 35
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -77,7 +84,7 @@
 					"\n",
 					"using System.Collections.Concurrent;"
 				],
-				"execution_count": 36
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -221,7 +228,7 @@
 					"    public string Contributor { get; set; }\n",
 					"}"
 				],
-				"execution_count": 37
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -240,7 +247,7 @@
 					"CloudBlobContainer blobContainer;\n",
 					"CloudBlobDirectory blobDirectory;\n",
 					"\n",
-					"var vaultName = \"\";\n",
+					"var vaultName = \"serengetikeyvaultqezfaqk\";\n",
 					"\n",
 					"string storageConnectionString = Credentials.GetSecret(vaultName,\"ADLS-ConnectionString\");\n",
 					"var dbConnectionString = Credentials.GetSecret(vaultName,\"DedicatedPool-ConnectionString\");\n",
@@ -255,7 +262,7 @@
 					"    blobDirectory = blobContainer.GetDirectoryReference(\"metadata\");\n",
 					"}"
 				],
-				"execution_count": 38
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -294,7 +301,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 39
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -317,8 +324,8 @@
 					"        {\"images\", \"CREATE TABLE images (id VARCHAR(255), file_name VARCHAR(255), frame_num INT, seq_id VARCHAR(255), width INT, height INT, corrupt BIT, location VARCHAR(255), seq_num_frames INT, datetime DATETIME);\"},\n",
 					"        {\"categories\", \"CREATE TABLE categories (id INT, name VARCHAR(255));\"},\n",
 					"        {\"annotations\", \"CREATE TABLE annotations ( id VARCHAR(255) NOT NULL, category_id INT NOT NULL, seq_id VARCHAR(255) NOT NULL, season VARCHAR(255) NOT NULL, datetime DATETIME NOT NULL, image_id VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL );\"},\n",
-					"        {\"train\", \"CREATE TABLE train ( image_id VARCHAR(255), category_id INT);\"},\n",
-					"        {\"val\", \"CREATE TABLE val ( image_id VARCHAR(255), category_id INT);\"}\n",
+					"        {\"train\", \"CREATE TABLE train ( image_id VARCHAR(255), category_name VARCHAR(255));\"},\n",
+					"        {\"val\", \"CREATE TABLE val ( image_id VARCHAR(255), category_name VARCHAR(255));\"}\n",
 					"    };\n",
 					"\n",
 					"    using(var conn = new SqlConnection(dbConnectionString))\n",
@@ -342,7 +349,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 40
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -402,7 +409,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 41
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -445,7 +452,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 42
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -498,7 +505,7 @@
 					"}\n",
 					""
 				],
-				"execution_count": 43
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -519,8 +526,7 @@
 					"    using(var conn = new SqlConnection(dbConnectionString))\n",
 					"    {\n",
 					"        await conn.OpenAsync();\n",
-					"        using (SqlCommand command = new SqlCommand($\"INSERT INTO {table} (image_id, category_id) SELECT image_id, category_id FROM annotations WHERE location IN ({string.Join(\",\", locations.Select(x => $\"'{x}'\"))}) AND category_id > 1\", conn)\n",
-					", conn)\n",
+					"        using (SqlCommand command = new SqlCommand($\"INSERT INTO {table} (image_id, category_name) SELECT annotations.image_id, categories.name FROM annotations JOIN categories ON annotations.category_id = categories.id WHERE annotations.location IN ({string.Join(\",\", locations.Select(x => $\"'{x}'\"))}) AND annotations.category_id > 1;\", conn)\n",
 					")\n",
 					"        {\n",
 					"            command.ExecuteNonQuery();\n",
@@ -528,7 +534,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 44
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -563,7 +569,7 @@
 					"    \"SnapshotSerengetiS11.json\"\n",
 					"};"
 				],
-				"execution_count": 45
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -609,7 +615,7 @@
 					"await Task.WhenAll(tasks);\n",
 					""
 				],
-				"execution_count": 46
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -631,7 +637,7 @@
 					"await InsertSplitImages(\"train\", splitData.splits.train.ToObject<List<string>>());\n",
 					"await InsertSplitImages(\"val\", splitData.splits.val.ToObject<List<string>>());"
 				],
-				"execution_count": 47
+				"execution_count": 26
 			}
 		]
 	}
