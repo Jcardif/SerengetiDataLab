@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "95d6257d-a400-45e0-8c5b-285abb59b7d8"
+				"spark.autotune.trackingId": "fd97eefb-7c5c-4513-a4a0-f3627389447d"
 			}
 		},
 		"metadata": {
@@ -277,13 +277,14 @@
 				"source": [
 					"initialize_adls_account()\n",
 					"\n",
+					"\n",
 					"url = df_train['image_link'][0]\n",
 					"name = df_train['image_id'][0].split('/').pop()\n",
 					"category = df_train['category_name'][0]\n",
 					"\n",
 					"upload_image(url, name, category, 'train')"
 				],
-				"execution_count": 101
+				"execution_count": 106
 			},
 			{
 				"cell_type": "code",
