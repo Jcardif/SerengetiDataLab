@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fd97eefb-7c5c-4513-a4a0-f3627389447d"
+				"spark.autotune.trackingId": "cd4d0c26-a47a-4199-a8f8-727988259b86"
 			}
 		},
 		"metadata": {
@@ -65,7 +65,7 @@
 					"%pip install azure-storage-file-datalake\n",
 					"%pip install azure-identity"
 				],
-				"execution_count": 69
+				"execution_count": 115
 			},
 			{
 				"cell_type": "code",
@@ -92,7 +92,7 @@
 					"pool_connection_string = mssparkutils.credentials.getSecret(vault_name, 'DedicatedPool-Jdbc-ConnectionString')\n",
 					"adls_connection_string = mssparkutils.credentials.getSecret(vault_name, 'ADLS-ConnectionString')"
 				],
-				"execution_count": 70
+				"execution_count": 116
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"\n",
 					"df_val = df_val.toPandas()"
 				],
-				"execution_count": 71
+				"execution_count": 117
 			},
 			{
 				"cell_type": "code",
@@ -151,25 +151,7 @@
 					"df_train[\"image_link\"] = df_train[\"image_id\"].apply(imageURL)\n",
 					"df_val[\"image_link\"] = df_val[\"image_id\"].apply(imageURL)"
 				],
-				"execution_count": 72
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"df_train[0:1]"
-				],
-				"execution_count": 73
+				"execution_count": 118
 			},
 			{
 				"cell_type": "code",
@@ -197,7 +179,7 @@
 					"    except Exception as e:\n",
 					"        print(e)"
 				],
-				"execution_count": 98
+				"execution_count": 119
 			},
 			{
 				"cell_type": "code",
@@ -259,7 +241,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 100
+				"execution_count": 120
 			},
 			{
 				"cell_type": "code",
@@ -275,16 +257,9 @@
 					}
 				},
 				"source": [
-					"initialize_adls_account()\n",
-					"\n",
-					"\n",
-					"url = df_train['image_link'][0]\n",
-					"name = df_train['image_id'][0].split('/').pop()\n",
-					"category = df_train['category_name'][0]\n",
-					"\n",
-					"upload_image(url, name, category, 'train')"
+					"initialize_adls_account()"
 				],
-				"execution_count": 106
+				"execution_count": 121
 			},
 			{
 				"cell_type": "code",
@@ -300,7 +275,47 @@
 					}
 				},
 				"source": [
-					""
+					"def upload_image_parallel(args):\n",
+					"    image_url, image_name, category, table = args\n",
+					"    upload_image(image_url, image_name, category, table)"
+				],
+				"execution_count": 122
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"for item in df_train.iloc:\n",
+					"    upload_image(item.image_link, item.image_id.split('/').pop(), item.category_name, 'train')"
+				],
+				"execution_count": 123
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"for item in df_val.iloc:\n",
+					"    upload_image(item.image_link, item.image_id.split('/').pop(), item.category_name, 'val')"
 				],
 				"execution_count": null
 			}
