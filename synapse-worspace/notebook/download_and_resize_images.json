@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "61713283-4667-48e0-8f42-44a596fdf60e"
+				"spark.autotune.trackingId": "95d6257d-a400-45e0-8c5b-285abb59b7d8"
 			}
 		},
 		"metadata": {
@@ -62,6 +62,25 @@
 					}
 				},
 				"source": [
+					"%pip install azure-storage-file-datalake\n",
+					"%pip install azure-identity"
+				],
+				"execution_count": 69
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
 					"import sys\n",
 					"from pyspark.sql import SparkSession\n",
 					"\n",
@@ -70,9 +89,10 @@
 					"\n",
 					"vault_name = 'serengetikeyvaultqezfaqk'\n",
 					"\n",
-					"pool_connection_string = mssparkutils.credentials.getSecret(vault_name, 'DedicatedPool-Jdbc-ConnectionString')"
+					"pool_connection_string = mssparkutils.credentials.getSecret(vault_name, 'DedicatedPool-Jdbc-ConnectionString')\n",
+					"adls_connection_string = mssparkutils.credentials.getSecret(vault_name, 'ADLS-ConnectionString')"
 				],
-				"execution_count": 11
+				"execution_count": 70
 			},
 			{
 				"cell_type": "code",
@@ -88,18 +108,28 @@
 					}
 				},
 				"source": [
-					"tableName = \"train\"\n",
+					"train_table_name = \"train\"\n",
+					"val_table_name = \"val\"\n",
 					"\n",
 					"df_train = spark.read \\\n",
 					"  .format(\"jdbc\") \\\n",
 					"  .option(\"url\", pool_connection_string) \\\n",
 					"  .option(\"forwardSparkAzureStorageCredentials\", \"true\") \\\n",
-					"  .option(\"dbTable\", tableName) \\\n",
+					"  .option(\"dbTable\", train_table_name) \\\n",
 					"  .load()\n",
 					"\n",
-					"df_train.show()"
+					"df_train = df_train.toPandas()\n",
+					"\n",
+					"df_val = spark.read \\\n",
+					"  .format(\"jdbc\") \\\n",
+					"  .option(\"url\", pool_connection_string) \\\n",
+					"  .option(\"forwardSparkAzureStorageCredentials\", \"true\") \\\n",
+					"  .option(\"dbTable\", val_table_name) \\\n",
+					"  .load()\n",
+					"\n",
+					"df_val = df_val.toPandas()"
 				],
-				"execution_count": 18
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -115,9 +145,145 @@
 					}
 				},
 				"source": [
-					"df_train"
+					"def imageURL(img_id):\n",
+					"    return f\"https://lilablobssc.blob.core.windows.net/snapshotserengeti-unzipped/{img_id}.JPG\"\n",
+					"\n",
+					"df_train[\"image_link\"] = df_train[\"image_id\"].apply(imageURL)\n",
+					"df_val[\"image_link\"] = df_val[\"image_id\"].apply(imageURL)"
 				],
-				"execution_count": 14
+				"execution_count": 72
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_train[0:1]"
+				],
+				"execution_count": 73
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from azure.storage.filedatalake import DataLakeServiceClient\n",
+					"\n",
+					"def initialize_adls_account():\n",
+					"    \n",
+					"    try:  \n",
+					"        global service_client\n",
+					"\n",
+					"        service_client = DataLakeServiceClient.from_connection_string(adls_connection_string)\n",
+					"    \n",
+					"    except Exception as e:\n",
+					"        print(e)"
+				],
+				"execution_count": 98
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import urllib.request\n",
+					"import io\n",
+					"from PIL import Image\n",
+					"from azure.identity import DefaultAzureCredential\n",
+					"from azure.storage.filedatalake import DataLakeFileClient\n",
+					"\n",
+					"\n",
+					"def resize_image (image_url):\n",
+					"    # Download the image from the URL\n",
+					"    with urllib.request.urlopen(image_url) as url:\n",
+					"        image_data = url.read()\n",
+					"    \n",
+					"    # Open the downloaded image using PIL\n",
+					"    image = Image.open(io.BytesIO(image_data))\n",
+					"\n",
+					"    # Resize the image to 224x224 pixels\n",
+					"    return image.resize((224, 224))\n",
+					"\n",
+					"\n",
+					"def upload_image(image_url, image_name, category, table):\n",
+					"    \n",
+					"    resized_image = resize_image(image_url)\n",
+					"\n",
+					"    # Save the resized image to Azure Data Lake Storage\n",
+					"    credential = DefaultAzureCredential()\n",
+					"    file_system_name = 'snapshot-serengeti'\n",
+					"    directory = 'images'\n",
+					"    file_name = f'{image_name}.JPG'\n",
+					"\n",
+					"    try:\n",
+					"\n",
+					"        file_system_client = service_client.get_file_system_client(file_system_name)\n",
+					"        directory_client = file_system_client.get_directory_client(directory)   \n",
+					"        file_client = directory_client.create_file(f'{table}/{category}/{file_name}')\n",
+					"\n",
+					"        with io.BytesIO() as output:\n",
+					"            resized_image.save(output, format='JPEG')\n",
+					"            output.seek(0)\n",
+					"            file_client.upload_data(data=output, overwrite=True)\n",
+					"\n",
+					"\n",
+					"    except Exception as e:\n",
+					"      print(e)\n",
+					"\n",
+					""
+				],
+				"execution_count": 100
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"initialize_adls_account()\n",
+					"\n",
+					"url = df_train['image_link'][0]\n",
+					"name = df_train['image_id'][0].split('/').pop()\n",
+					"category = df_train['category_name'][0]\n",
+					"\n",
+					"upload_image(url, name, category, 'train')"
+				],
+				"execution_count": 101
 			},
 			{
 				"cell_type": "code",
