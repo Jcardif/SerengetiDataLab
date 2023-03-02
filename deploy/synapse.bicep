@@ -4,7 +4,7 @@ param fileSystemName string
 param storageAccountUrl string
 param storageResourceId string
 param sqlPoolName string = 'defdedicated'
-param performanceLevel string = 'DW1000c'
+param performanceLevel string = 'DW400' // TODO: Drop down from params
 param capacity int = 100
 param sqlPoolTier string = 'Standard'
 param sqlAdministratorLogin string
