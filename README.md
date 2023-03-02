@@ -41,3 +41,4 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
     ![](/images/deployed_resources.png)
 
 ##  🧪 Lab Configuration
+
