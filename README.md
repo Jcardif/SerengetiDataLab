@@ -3,7 +3,7 @@
 An E2E solution of the Data Resources on Azure using the Snapshot Serengeti dataset. This E2E solution focuses Azure Synapse Analytics,  Power Bi & the Azure Data Factory. 
 
 ## 🤔 Prerequisites
-1. An active Azure Subscription. if you do not have one you can create a free Azure Subscription. 
+1. An active Azure Subscription. if you do not have one you can [create a free Azure Subscription](https://azure.microsoft.com/en-in/free/). 
 2. Appropriate permissions within the Azure subscription that will allow for creating resources, assigning roles, registering providers and deleting resources.
 
     To proceed you need to deploy the following azure resources:
@@ -14,6 +14,7 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
     * Microsoft.MachineLearningServices
     * Microsoft.Insights
     * Microsoft.OperationalInsights
+    * Microsoft.Sql
 
 
     > :warning: In case any of these resources providers are not registered, follow the [steps from the documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types) to register them. 
@@ -35,3 +36,8 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
 4. Once the validation is done, click on the **Create** button to start the deployment.
 
 5. The deployment should take approximately 10 minutes to complete. Once the deployment is completed, you can navigate to the resource group to check the deployed resources.
+
+6. If Successful you should see 10 resoiurces in your resource group.
+    ![](/images/deployed_resources.png)
+
+##  🧪 Lab Configuration
