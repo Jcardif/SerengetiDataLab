@@ -55,6 +55,6 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
 
     ![](/images/configure_git_02.png)
 
-5. When this completes select our working branch then save.
+5. When this completes select your working branch then save.
 > :information_source: To learn more about Git & source control in a Synapse Workspace [read more here](https://learn.microsoft.com/en-us/azure/synapse-analytics/cicd/source-control)
 
