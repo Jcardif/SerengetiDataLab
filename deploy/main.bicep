@@ -97,6 +97,15 @@ resource dedicatedSqlPoolODBCConnectionString 'Microsoft.KeyVault/vaults/secrets
   }
 }
 
+resource dedicatedSqlPoolJDBCConnectionString 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+  name: '${SerengetiVault.name}/DedicatedPool-Jdbc-ConnectionString'
+  properties: {
+    value: 'jdbc:sqlserver://${synapseWorkspace.outputs.synapseWorkspaceName}.sql.azuresynapse.net:1433;database=${synapseWorkspace.outputs.synapseDedicatedSqlPoolName};user=${sqlAdministratorLogin}@${synapseWorkspace.outputs.synapseWorkspaceName};password=${sqlAdministratorLoginPassword};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.sql.azuresynapse.net;loginTimeout=30;'
+    contentType: 'text/plain'
+  }
+}
+
+
 resource DataLakeConnectionString 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   name: '${SerengetiVault.name}/ADLS-ConnectionString'
   properties: {

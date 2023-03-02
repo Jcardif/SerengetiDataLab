@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.85.62628",
-      "templateHash": "2845610480191597995"
+      "templateHash": "7512704833063929560"
     }
   },
   "parameters": {
@@ -110,6 +110,19 @@
       "name": "[format('{0}/DedicatedPool-odbc-ConnectionString', variables('vaultName'))]",
       "properties": {
         "value": "[format('Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{0}.sql.azuresynapse.net,1433;Database={1};Uid={2};Pwd={3};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;', reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceName.value, reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseDedicatedSqlPoolName.value, parameters('sqlAdministratorLogin'), parameters('sqlAdministratorLoginPassword'))]",
+        "contentType": "text/plain"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]",
+        "[resourceId('Microsoft.Resources/deployments', 'synapseWorkspace')]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2022-07-01",
+      "name": "[format('{0}/DedicatedPool-Jdbc-ConnectionString', variables('vaultName'))]",
+      "properties": {
+        "value": "[format('jdbc:sqlserver://{0}.sql.azuresynapse.net:1433;database={1};user={2}@{3};password={4};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.sql.azuresynapse.net;loginTimeout=30;', reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceName.value, reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseDedicatedSqlPoolName.value, parameters('sqlAdministratorLogin'), reference(resourceId('Microsoft.Resources/deployments', 'synapseWorkspace'), '2020-10-01').outputs.synapseWorkspaceName.value, parameters('sqlAdministratorLoginPassword'))]",
         "contentType": "text/plain"
       },
       "dependsOn": [
