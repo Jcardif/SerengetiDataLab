@@ -4,7 +4,7 @@ param fileSystemName string
 param storageAccountUrl string
 param storageResourceId string
 param sqlPoolName string = 'defdedicated'
-param performanceLevel string = 'DW400' // TODO: Drop down from params
+param performanceLevel string = 'DW400c' // TODO: Drop down from params
 param capacity int = 100
 param sqlPoolTier string = 'Standard'
 param sqlAdministratorLogin string
@@ -24,7 +24,6 @@ resource synapseSerengeti 'Microsoft.Synapse/workspaces@2021-06-01' = {
       filesystem: fileSystemName
       resourceId: storageResourceId
     }
-
 
     managedResourceGroupName: '${resourceGroup().name}-mrg'
 

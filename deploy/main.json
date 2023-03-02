@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.85.62628",
-      "templateHash": "13316983793202578287"
+      "templateHash": "10133684259279883195"
     }
   },
   "parameters": {
@@ -255,7 +255,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.85.62628",
-              "templateHash": "16502162427794436736"
+              "templateHash": "12427593722656540779"
             }
           },
           "parameters": {
@@ -281,7 +281,7 @@
             },
             "performanceLevel": {
               "type": "string",
-              "defaultValue": "DW400"
+              "defaultValue": "DW400c"
             },
             "capacity": {
               "type": "int",
