@@ -41,4 +41,20 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
     ![](/images/deployed_resources.png)
 
 ##  🧪 Lab Configuration
+1. Click on the Synapse Workspace resource and then launch Synapse Studio. 
+    ![](/images/open_synapse_studio.png)
+
+2. We'll need to link the synapse workspace to the repo you forked in the pre-requisites so that we can import the necessary notebooks and scripts.  Click on `Manage` > `Git Configuration` > `Configure` 
+    ![](/images/configure_git_01.png)
+
+3. On the wizard that opens, select the Repository type to be `GitHub` the GitHub repository owner as `your GitHub username`, then proceed to authenticate to your GitHub. 
+
+3. After successful authentication, select the repository name from the dropdown. For the `Collaboration branch` create a new branch or just select the default `main` branch and similarly for the  `Publish branch`
+
+4. The `Root folder` input `synapse-worspace` and ensure the `Import existing resources` checkbox is checked, then finally click **Apply**
+
+    ![](/images/configure_git_02.png)
+
+5. When this completes select our working branch then save.
+> :information_source: To learn more about Git & source control in a Synapse Workspace [read more here](https://learn.microsoft.com/en-us/azure/synapse-analytics/cicd/source-control)
 
