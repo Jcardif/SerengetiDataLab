@@ -362,3 +362,8 @@ linkedService/
 
 .DS_Store
 /.DS_Store
+
+/.vscode
+.vscode/*
+.vscode/
+.vscode

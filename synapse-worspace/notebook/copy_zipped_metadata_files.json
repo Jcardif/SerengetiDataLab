@@ -18,15 +18,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5b1d34e4-f7bb-4610-9502-af6e2b8c2f05"
+				"spark.autotune.trackingId": "851a3783-c59b-4a39-8a35-7d51b0add688"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_pyspark",
-				"display_name": "Synapse PySpark"
+				"name": "synapse_sparkdotnet",
+				"display_name": "csharp"
 			},
 			"language_info": {
 				"name": "csharp"
@@ -114,8 +114,9 @@
 					"CloudBlobDirectory destDirectory;\n",
 					"\n",
 					"var vaultName = \"serengetikeyvaultqezfaqk\";\n",
+					"var linkConnectionName = \"\";\n",
 					"\n",
-					"string destConnectionString = Credentials.GetSecret(vaultName,\"ADLS-ConnectionString\");"
+					"string destConnectionString = Credentials.GetSecret(vaultName,\"ADLS-ConnectionString\", linkConnectionName);"
 				],
 				"execution_count": 6
 			},
