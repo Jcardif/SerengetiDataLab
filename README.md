@@ -3,7 +3,7 @@
 An E2E solution of the Data Resources on Azure using the Snapshot Serengeti dataset. This E2E solution focuses Azure Synapse Analytics,  Power Bi & the Azure Data Factory. 
 
 ## 🤔 Prerequisites
-1. An active Azure Subscription. if you do not have one you can [create a free Azure Subscription](https://azure.microsoft.com/en-in/free/). 
+1. An active Azure Subscription. if you do not have one you can [create a free Azure Subscription](https://azure.microsoft.com/en-in/free/?WT.mc_id=data-89327-jndemenge). 
 2. Appropriate permissions within the Azure subscription that will allow for creating resources, assigning roles, registering providers and deleting resources.
 
     To proceed you need to deploy the following azure resources:
@@ -17,7 +17,7 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
     * Microsoft.Sql
 
 
-    > :warning: In case any of these resources providers are not registered, follow the [steps from the documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types) to register them. 
+    > :warning: In case any of these resources providers are not registered, follow the [steps from the documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types/?WT.mc_id=data-89327-jndemenge) to register them. 
 
 3. Fork this repository to your GitHub account so that you can link it to the synapse workspace.
 
@@ -27,7 +27,7 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
 
     [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJcardif%2FSerengetiDataLab%2Fmain%2Fdeploy%2Fmain.json)
 
-2. On the opened azure portal custom deployment page select the subscription from the drop-down, next click on the create new and provide a unique name to your resource group then select a [valid location](https://azure.microsoft.com/en-gb/explore/global-infrastructure/products-by-region/?products=machine-learning-service,synapse-analytics&regions=all) for the resources. 
+2. On the opened azure portal custom deployment page select the subscription from the drop-down, next click on the create new and provide a unique name to your resource group then select a [valid location](https://azure.microsoft.com/en-gb/explore/global-infrastructure/products-by-region/?products=machine-learning-service,synapse-analytics&regions=all&WT.mc_id=data-89327-jndemenge) for the resources. 
 
     ![](/images/lab_deployment.png)
 
@@ -56,7 +56,7 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
     ![](/images/configure_git_02.png)
 
 5. When this completes select your working branch then save.
-> :information_source: To learn more about Git & source control in a Synapse Workspace [read more here](https://learn.microsoft.com/en-us/azure/synapse-analytics/cicd/source-control)
+> :information_source: To learn more about Git & source control in a Synapse Workspace [read more here](https://learn.microsoft.com/en-us/azure/synapse-analytics/cicd/source-control/?WT.mc_id=data-89327-jndemenge)
 
 ## 🧹 Clean Up Resources
 To save up on your cloud costs,delete the resource group that was created for this lab, after completing the workshop. To do so, navigate to the resource group and click on the delete button.
