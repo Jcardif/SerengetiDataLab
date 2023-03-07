@@ -58,3 +58,7 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
 5. When this completes select your working branch then save.
 > :information_source: To learn more about Git & source control in a Synapse Workspace [read more here](https://learn.microsoft.com/en-us/azure/synapse-analytics/cicd/source-control)
 
+## 🧹 Clean Up Resources
+To save up on your cloud costs,delete the resource group that was created for this lab, after completing the workshop. To do so, navigate to the resource group and click on the delete button.
+  
+  ![](/images/delete_rg.png)
