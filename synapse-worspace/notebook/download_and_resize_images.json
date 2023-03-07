@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "85ce4b21-7227-4c2f-b8c6-3cb61f3b8aa0"
+				"spark.autotune.trackingId": "a4de8630-4eca-4e94-a3d4-38ddc51ebe55"
 			}
 		},
 		"metadata": {
@@ -93,7 +93,7 @@
 					"pool_connection_string = mssparkutils.credentials.getSecret(vault_name, 'DedicatedPool-Jdbc-ConnectionString', linkConnectionName)\n",
 					"adls_connection_string = mssparkutils.credentials.getSecret(vault_name, 'ADLS-ConnectionString', linkConnectionName)"
 				],
-				"execution_count": 116
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
