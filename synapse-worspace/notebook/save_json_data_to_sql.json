@@ -17,15 +17,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c215d259-bdac-4f91-b813-aa52332fe137"
+				"spark.autotune.trackingId": "390b547d-694a-4852-8f02-44f9080c6b8d"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_pyspark",
-				"display_name": "Synapse PySpark"
+				"name": "synapse_sparkdotnet",
+				"display_name": "csharp"
 			},
 			"language_info": {
 				"name": "csharp"
@@ -248,9 +248,10 @@
 					"CloudBlobDirectory blobDirectory;\n",
 					"\n",
 					"var vaultName = \"serengetikeyvaultqezfaqk\";\n",
+					"var linkConnectionName = \"\";\n",
 					"\n",
-					"string storageConnectionString = Credentials.GetSecret(vaultName,\"ADLS-ConnectionString\");\n",
-					"var dbConnectionString = Credentials.GetSecret(vaultName,\"DedicatedPool-ConnectionString\");\n",
+					"string storageConnectionString = Credentials.GetSecret(vaultName,\"ADLS-ConnectionString\", linkConnectionName);\n",
+					"var dbConnectionString = Credentials.GetSecret(vaultName,\"DedicatedPool-ConnectionString\", linkConnectionName);\n",
 					"\n",
 					"private void InitStorageAndDb()\n",
 					"{\n",

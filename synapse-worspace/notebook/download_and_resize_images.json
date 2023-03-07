@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cd4d0c26-a47a-4199-a8f8-727988259b86"
+				"spark.autotune.trackingId": "85ce4b21-7227-4c2f-b8c6-3cb61f3b8aa0"
 			}
 		},
 		"metadata": {
@@ -65,7 +65,7 @@
 					"%pip install azure-storage-file-datalake\n",
 					"%pip install azure-identity"
 				],
-				"execution_count": 115
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -88,9 +88,10 @@
 					"token_library = sc._jvm.com.microsoft.azure.synapse.tokenlibrary.TokenLibrary\n",
 					"\n",
 					"vault_name = 'serengetikeyvaultqezfaqk'\n",
+					"linkConnectionName = ''\n",
 					"\n",
-					"pool_connection_string = mssparkutils.credentials.getSecret(vault_name, 'DedicatedPool-Jdbc-ConnectionString')\n",
-					"adls_connection_string = mssparkutils.credentials.getSecret(vault_name, 'ADLS-ConnectionString')"
+					"pool_connection_string = mssparkutils.credentials.getSecret(vault_name, 'DedicatedPool-Jdbc-ConnectionString', linkConnectionName)\n",
+					"adls_connection_string = mssparkutils.credentials.getSecret(vault_name, 'ADLS-ConnectionString', linkConnectionName)"
 				],
 				"execution_count": 116
 			},
