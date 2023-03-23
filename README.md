@@ -37,7 +37,7 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
 
 5. The deployment should take approximately 10 minutes to complete. Once the deployment is completed, you can navigate to the resource group to check the deployed resources.
 
-6. If Successful you should see 10 resoiurces in your resource group.
+6. If Successful you should see 10 resources in your resource group.
     ![](/images/deployed_resources.png)
 
 ##  🧪 Lab Configuration
@@ -49,9 +49,9 @@ An E2E solution of the Data Resources on Azure using the Snapshot Serengeti data
 
 3. On the wizard that opens, select the Repository type to be `GitHub` the GitHub repository owner as `your GitHub username`, then proceed to authenticate to your GitHub. 
 
-3. After successful authentication, select the repository name from the dropdown. For the `Collaboration branch` create a new branch or just select the default `main` branch and similarly for the  `Publish branch`
+3. After successful authentication, select the repository name from the dropdown. For the `Collaboration branch`select the default `main` branch and similarly for the  `Publish branch` select the `main` branch.
 
-4. The `Root folder` input `synapse-worspace` and ensure the `Import existing resources` checkbox is checked, then finally click **Apply**
+4. The `Root folder` input `synapse-worspace` then finally click **Apply**
 
     ![](/images/configure_git_02.png)
 
